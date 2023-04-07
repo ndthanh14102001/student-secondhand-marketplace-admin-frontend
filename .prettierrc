@@ -1,0 +1,26 @@
+{
+  "singleQuote": true,
+  "semi": false,
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "insertPragma": false,
+  "printWidth": 80,
+  "endOfLine": "auto",
+  "overrides": [
+    {
+      "files": ".prettierrc",
+      "options": { "parser": "json" }
+    }
+  ],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "insertPragma": true,
+        "endOfLine": "auto",
+        "singleQuote": false,
+        "trailingComma": "all"
+      }
+    ]
+  }
+}
