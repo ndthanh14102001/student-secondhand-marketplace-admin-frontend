@@ -19,14 +19,12 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
 export default function UpdateCategoryModal(props) {
-  const [value, setValue] = useState(props.categoryParent)
-  const handleCreateNewItem = (e) => {
-    e.preventDefault()
-    setValue(e.target.value)
-  }
   // Thông báo snackbar
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = React.useState(false)
   const [openErrorSnackbar, setOpenErrorSnackbar] = React.useState(false)
+  const [error, setError] = useState(null)
+
+  console.log(props.category.attributes.name)
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return
@@ -48,43 +46,66 @@ export default function UpdateCategoryModal(props) {
       </IconButton>
     </React.Fragment>
   )
-
-  const [error, setError] = useState(null)
   // const [modifiedData, setModifiedData] = useState({
-  //   id: props.categoryID,
-  //   name: props.categoryName,
-  //   description: props.categoryDescription,
-  //   parent: props.categoryParent,
+  //   id: '',
+  //   name: '',
+  //   description: '',
+  //   parent: '',
   // })
 
-  // console.log(modifiedData)
+  const [id, setId] = useState(props.category.id)
+  const [name, setName] = useState(props.category.attributes.name)
+  const [description, setDescription] = useState(
+    props.category.attributes.description,
+  )
+  const [parent, setParent] = useState(
+    props.category.attributes.parent?.data?.id,
+  )
+  // const [image, setImage] = useState(
+  //   props.category.attributes.parent?.data?.id,
+  // )
 
-  // const handleInputChange = useCallback(({ target: { name, value } }) => {
-  //   setModifiedData((prevData) => ({ ...prevData, [name]: value }))
-  // }, [])
+  useEffect(() => {
+    setId(props.category.id)
+    setName(props.category.attributes.name)
+    setDescription(props.category.attributes.description)
+    setParent(props.category.attributes.parent?.data?.id)
+  }, [props.category])
+
+  const handleIdChange = (event) => {
+    setId(event.target.value)
+  }
+
+  const handleNameChange = (event) => {
+    setName(event.target.value)
+  }
+
+  const handleDescriptionChange = (event) => {
+    setDescription(event.target.value)
+  }
+
+  const handleParentChange = (event) => {
+    setParent(event.target.value)
+  }
 
   const handleUpdateSubmition = async (e) => {
     e.preventDefault()
-    console.log({
-      name: document.getElementById('update_name').value,
-      description: document.getElementById('update_description').value,
-      parent: value,
-    })
+    const data = {
+      id: id,
+      name: name,
+      description: description,
+      parent: parent,
+      image: null,
+    }
+    console.log(data)
     await axios
-      .put(
-        process.env.REACT_APP_API_ENDPOINT + '/categories/' + props.categoryID,
-        {
-          data: {
-            name: document.getElementById('update_name').value,
-            description: document.getElementById('update_description').value,
-            parent: value,
-            children: null,
-          },
-        },
-      )
+      .put(process.env.REACT_APP_API_ENDPOINT + '/categories/' + id, {
+        data: data,
+      })
       .then((response) => {
-        console.log(response)
         setOpenSuccessSnackbar(true)
+        console.log(response)
+        props.onUpdate()
       })
       .catch((error) => {
         setError(error)
@@ -126,8 +147,8 @@ export default function UpdateCategoryModal(props) {
                   label="Tên danh mục"
                   id="update_name"
                   name="name"
-                  // onChange={handleInputChange}
-                  defaultValue={props.categoryName}
+                  onChange={handleNameChange}
+                  value={name}
                 />
               </FormControl>
               <FormControl sx={{ m: 1, width: '450px' }} variant="outlined">
@@ -135,8 +156,8 @@ export default function UpdateCategoryModal(props) {
                   label="Mô tả"
                   id="update_description"
                   name="description"
-                  // onChange={handleInputChange}
-                  defaultValue={props.categoryDescription}
+                  onChange={handleDescriptionChange}
+                  value={description}
                 />
               </FormControl>
               <FormControl sx={{ m: 1, width: '450px' }} variant="outlined">
@@ -146,14 +167,15 @@ export default function UpdateCategoryModal(props) {
                   name="parent"
                   label="Danh mục cha"
                   align="left"
-                  onChange={handleCreateNewItem}
-                  value={value ? value : props.categoryParent}
+                  onChange={handleParentChange}
+                  value={parent}
                 >
-                  {props.categoryData.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
-                      {option.attributes.name}
-                    </MenuItem>
-                  ))}
+                  {props.categoryData &&
+                    props.categoryData.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.attributes.name}
+                      </MenuItem>
+                    ))}
                 </TextField>
               </FormControl>
               {/* <FormControl sx={{ m: 1, width: '450px' }} variant="outlined">

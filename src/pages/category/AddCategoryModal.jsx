@@ -44,12 +44,12 @@ export default function AddUserModal(props) {
     </React.Fragment>
   )
 
-  const [error, setError] = useState(null)
   const [modifiedData, setModifiedData] = useState({
     name: '',
     description: '',
     parent: '',
     children: null,
+    image: null,
   })
 
   const handleInputChange = useCallback(({ target: { name, value } }) => {
@@ -66,10 +66,10 @@ export default function AddUserModal(props) {
       .then((response) => {
         setOpenSuccessSnackbar(true)
         console.log(response)
+        props.onCreate()
       })
       .catch((error) => {
         setOpenErrorSnackbar(true)
-        setError(error)
       })
   }
 
@@ -159,7 +159,6 @@ export default function AddUserModal(props) {
                 maxRows={1}
               />
             </FormControl> */}
-              {error}
             </CardContent>
             <CardActions sx={{ justifyContent: 'center' }}>
               <Button

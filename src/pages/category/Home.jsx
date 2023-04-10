@@ -56,23 +56,36 @@ export default function category() {
   const handleCloseDeleteCategoryModal = () => setOpenDeleteCategoryModal(false)
 
   // Using for Dialog update category
-  const [categoryUpdateData, setCategoryUpdateData] = useState({
-    id: '',
-    name: '',
-    description: '',
-    parent: '',
-  })
+  const [selectedCategory, setSelectedCategory] = useState(null)
+
   const [openUpdateCategoryModal, setOpenUpdateCategoryModal] = useState(false)
-  const handleOpenUpdateCategoryModal = (id, name, description, parent) => {
-    // console.log(data)
-    const data = {
-      id: id,
-      name: name,
-      description: description,
-      parent: parent,
-    }
+  const handleOpenUpdateCategoryModal = (category) => {
     setOpenUpdateCategoryModal(true)
-    setCategoryUpdateData(data)
+    setSelectedCategory(category)
+  }
+
+  const handleOnCreate = () => {
+    const requestUrl =
+      process.env.REACT_APP_API_ENDPOINT +
+      `/categories?populate=*&pagination[page]=1&pagination[pageSize]=7&filters[NAME][$contains]=${searchedKey}`
+    fetch(requestUrl)
+      .then((res) => res.json())
+      .then((posts) => {
+        console.log('đã được gọi')
+        setCustomer(posts.data)
+      })
+  }
+
+  const handleUpdate = () => {
+    const requestUrl =
+      process.env.REACT_APP_API_ENDPOINT +
+      `/categories?populate=*&pagination[page]=${selectedPage}&pagination[pageSize]=7&filters[NAME][$contains]=${searchedKey}`
+    fetch(requestUrl)
+      .then((res) => res.json())
+      .then((posts) => {
+        console.log('đã được gọi')
+        setCustomer(posts.data)
+      })
   }
 
   const handleCloseUpdateCategoryModal = () => setOpenUpdateCategoryModal(false)
@@ -155,16 +168,17 @@ export default function category() {
             open={openAddCategoryModal}
             onClose={handleCloseAddCategoryModal}
             categoryData={elementNum}
+            onCreate={handleOnCreate}
           />
-          <UpdateCategoryModal
-            open={openUpdateCategoryModal}
-            onClose={handleCloseUpdateCategoryModal}
-            categoryID={categoryUpdateData.id}
-            categoryName={categoryUpdateData.name}
-            categoryDescription={categoryUpdateData.description}
-            categoryParent={categoryUpdateData.parent}
-            categoryData={elementNum}
-          />
+          {selectedCategory && (
+            <UpdateCategoryModal
+              open={openUpdateCategoryModal}
+              onClose={handleCloseUpdateCategoryModal}
+              category={selectedCategory}
+              categoryData={elementNum}
+              onUpdate={handleUpdate}
+            />
+          )}
           <DeleteCategoryModal
             open={openDeleteCategoryModal}
             onClose={handleCloseDeleteCategoryModal}
@@ -230,14 +244,7 @@ export default function category() {
                   <IconButton
                     color="primary"
                     onClick={() => {
-                      handleOpenUpdateCategoryModal(
-                        row.id,
-                        row.attributes.name,
-                        row.attributes.description,
-                        row.attributes.parent.data
-                          ? row.attributes.parent.data.id
-                          : '',
-                      )
+                      handleOpenUpdateCategoryModal(row)
                     }}
                   >
                     <ConstructionIcon />
