@@ -1,0 +1,16 @@
+Patch Note:
+[1.0 - 22/03/2023]
+- Create Project
+
+[1.1 - 24/03/2023]
+- Add UI category management
+- Add UI report management
+
+[1.2 - 03/04/2023]
+- Attach API to category display, add, update, delete with notification
+- Add Chat UI
+- Remove unnecessary options in admin panel
+
+[1.2.1 - 11/04/2023]
+- Reconstruct code
+- CRUD in category will now immidiately update to table

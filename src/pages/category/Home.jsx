@@ -67,7 +67,7 @@ export default function category() {
   const handleOnCreate = () => {
     const requestUrl =
       process.env.REACT_APP_API_ENDPOINT +
-      `/categories?populate=*&pagination[page]=1&pagination[pageSize]=7&filters[NAME][$contains]=${searchedKey}`
+      `/categories?populate=*&pagination[page]=1&pagination[pageSize]=7&filters[name][$contains]=${searchedKey}`
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {
@@ -79,7 +79,7 @@ export default function category() {
   const handleUpdate = () => {
     const requestUrl =
       process.env.REACT_APP_API_ENDPOINT +
-      `/categories?populate=*&pagination[page]=${selectedPage}&pagination[pageSize]=7&filters[NAME][$contains]=${searchedKey}`
+      `/categories?populate=*&pagination[page]=${selectedPage}&pagination[pageSize]=7&filters[name][$contains]=${searchedKey}`
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {
@@ -102,7 +102,7 @@ export default function category() {
   useEffect(() => {
     const requestUrl =
       process.env.REACT_APP_API_ENDPOINT +
-      `/categories?populate=*&pagination[page]=${selectedPage}&pagination[pageSize]=7&filters[NAME][$contains]=${searchedKey}`
+      `/categories?populate=*&pagination[page]=${selectedPage}&pagination[pageSize]=7&filters[name][$contains]=${searchedKey}`
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {
@@ -113,7 +113,7 @@ export default function category() {
   useEffect(() => {
     const requestUrl =
       process.env.REACT_APP_API_ENDPOINT +
-      `/categories?filters[NAME][$contains]=${searchedKey}`
+      `/categories?filters[name][$contains]=${searchedKey}`
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {
@@ -194,6 +194,9 @@ export default function category() {
             <TableRow sx={{ backgroundColor: '#1976d2' }}>
               <TableCell sx={{ color: 'white' }}>Mã danh mục</TableCell>
               <TableCell sx={{ color: 'white' }} align="center">
+                Ảnh
+              </TableCell>
+              <TableCell sx={{ color: 'white' }} align="center">
                 Tên danh mục
               </TableCell>
               <TableCell sx={{ color: 'white' }} align="center">
@@ -219,26 +222,54 @@ export default function category() {
                 <TableCell component="th" scope="row" align="center">
                   {row.id}
                 </TableCell>
+                <TableCell align="center">
+                  {row.attributes.image?.data ? (
+                    <Box key={row.id}>
+                      <img
+                        src={
+                          process.env.REACT_APP_SERVER_ENDPOINT +
+                          row.attributes.image.data.attributes.url
+                        }
+                        alt={row.attributes.image.data.attributes.name}
+                        style={{ width: '50px', height: '50px' }}
+                      ></img>
+                    </Box>
+                  ) : (
+                    <p style={{ color: 'lightgrey' }}>Chưa có ảnh</p>
+                  )}
+                </TableCell>
                 <TableCell align="center">{row.attributes.name}</TableCell>
                 <TableCell
                   align="right"
-                  sx={{ color: row.attributes.description ? 'black' : 'grey' }}
+                  sx={{
+                    color: row.attributes.description ? 'black' : 'lightgrey',
+                  }}
                 >
                   {row.attributes.description
                     ? row.attributes.description
-                    : 'Chưa có'}
+                    : 'Chưa có mô tả'}
                 </TableCell>
-                <TableCell align="center">
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: row.attributes.parent.data ? 'black' : 'blue',
+                  }}
+                >
                   {row.attributes.parent.data
                     ? row.attributes.parent.data.attributes.name
-                    : 'Chưa có'}
+                    : 'Danh mục cao nhất'}
                 </TableCell>
-                <TableCell align="center">
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: row.attributes.children.data ? 'black' : 'lightgrey',
+                  }}
+                >
                   {row.attributes.children.data
                     ? row.attributes.children.data.map((row) => (
                         <Box key={row.id}>{row.attributes.name}</Box>
                       ))
-                    : 'Chưa có'}
+                    : 'Chưa có danh mục con'}
                 </TableCell>
                 <TableCell align="center">
                   <IconButton

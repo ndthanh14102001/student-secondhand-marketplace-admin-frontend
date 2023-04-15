@@ -17,14 +17,14 @@ import axios from 'axios'
 
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import { Avatar, Box } from '../../../node_modules/@mui/material/index'
 
 export default function UpdateCategoryModal(props) {
+  console.log(props.category.attributes.image?.data)
   // Thông báo snackbar
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = React.useState(false)
   const [openErrorSnackbar, setOpenErrorSnackbar] = React.useState(false)
   const [error, setError] = useState(null)
-
-  console.log(props.category.attributes.name)
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return
@@ -61,16 +61,11 @@ export default function UpdateCategoryModal(props) {
   const [parent, setParent] = useState(
     props.category.attributes.parent?.data?.id,
   )
+
+  const [image, setImage] = useState(props.category.attributes.image?.data)
   // const [image, setImage] = useState(
   //   props.category.attributes.parent?.data?.id,
   // )
-
-  useEffect(() => {
-    setId(props.category.id)
-    setName(props.category.attributes.name)
-    setDescription(props.category.attributes.description)
-    setParent(props.category.attributes.parent?.data?.id)
-  }, [props.category])
 
   const handleIdChange = (event) => {
     setId(event.target.value)
@@ -88,6 +83,41 @@ export default function UpdateCategoryModal(props) {
     setParent(event.target.value)
   }
 
+  // Upload file here
+  const [urlAvatar, setUrlAvatar] = useState()
+  const [fileAvatarInput, setFileAvatarInput] = useState()
+
+  const handleOpenImage = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = (event) => {
+      const file = event.target.files[0]
+      setFileAvatarInput(file)
+      console.log(file)
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = () => {
+          setUrlAvatar(reader.result)
+        }
+        reader.readAsDataURL(file)
+        console.log(reader.result)
+      }
+    }
+    input.click()
+  }
+
+  // Refresh update form
+  useEffect(() => {
+    setId(props.category.id)
+    setName(props.category.attributes.name)
+    setDescription(props.category.attributes.description)
+    setParent(props.category.attributes.parent?.data?.id)
+    setImage(props.category.attributes.image?.data)
+    setUrlAvatar(null)
+  }, [props.category])
+
+  // Function after click submit update
   const handleUpdateSubmition = async (e) => {
     e.preventDefault()
     const data = {
@@ -95,22 +125,52 @@ export default function UpdateCategoryModal(props) {
       name: name,
       description: description,
       parent: parent,
-      image: null,
+      image: urlAvatar ? urlAvatar : image,
     }
-    console.log(data)
-    await axios
-      .put(process.env.REACT_APP_API_ENDPOINT + '/categories/' + id, {
-        data: data,
-      })
-      .then((response) => {
-        setOpenSuccessSnackbar(true)
-        console.log(response)
-        props.onUpdate()
-      })
-      .catch((error) => {
-        setError(error)
-        setOpenErrorSnackbar(true)
-      })
+
+    if (urlAvatar) {
+      let formData = new FormData()
+      formData.append('files', fileAvatarInput)
+      await axios
+        .post(process.env.REACT_APP_API_ENDPOINT + '/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            // Authorization: user.token,
+          },
+        })
+        .then((response) => {
+          axios
+            .put(process.env.REACT_APP_API_ENDPOINT + '/categories/' + id, {
+              data: { ...data, image: response.data[0].id },
+            })
+            .then((response) => {
+              setOpenSuccessSnackbar(true)
+              console.log(response)
+              props.onUpdate()
+            })
+            .catch((error) => {
+              setOpenErrorSnackbar(true)
+            })
+        })
+        .catch((error) => {
+          setOpenErrorSnackbar(true)
+        })
+    } else {
+      console.log(data)
+      await axios
+        .put(process.env.REACT_APP_API_ENDPOINT + '/categories/' + id, {
+          data: data,
+        })
+        .then((response) => {
+          setOpenSuccessSnackbar(true)
+          console.log(response)
+          props.onUpdate()
+        })
+        .catch((error) => {
+          setError(error)
+          setOpenErrorSnackbar(true)
+        })
+    }
   }
 
   return (
@@ -142,54 +202,82 @@ export default function UpdateCategoryModal(props) {
               Cập nhật danh mục
             </Typography>
             <CardContent align="center">
-              <FormControl sx={{ m: 1, width: '450px' }} variant="outlined">
-                <TextField
-                  label="Tên danh mục"
-                  id="update_name"
-                  name="name"
-                  onChange={handleNameChange}
-                  value={name}
-                />
-              </FormControl>
-              <FormControl sx={{ m: 1, width: '450px' }} variant="outlined">
-                <TextField
-                  label="Mô tả"
-                  id="update_description"
-                  name="description"
-                  onChange={handleDescriptionChange}
-                  value={description}
-                />
-              </FormControl>
-              <FormControl sx={{ m: 1, width: '450px' }} variant="outlined">
-                <TextField
-                  id="update_parent"
-                  select
-                  name="parent"
-                  label="Danh mục cha"
-                  align="left"
-                  onChange={handleParentChange}
-                  value={parent}
-                >
-                  {props.categoryData &&
-                    props.categoryData.map((option) => (
-                      <MenuItem key={option.id} value={option.id}>
-                        {option.attributes.name}
-                      </MenuItem>
-                    ))}
-                </TextField>
-              </FormControl>
-              {/* <FormControl sx={{ m: 1, width: '450px' }} variant="outlined">
-                <TextField
-                  label="Mã danh mục con"
-                  id="children"
-                  name="children"
-                  onChange={handleInputChange}
-                  value={modifiedData.children}
-                  multiline
-                  maxRows={1}
-                />
-              </FormControl> */}
-              {error}
+              <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                <Box sx={{ display: 'flex' }}>
+                  <Avatar
+                    sx={{
+                      width: 150,
+                      height: 150,
+                      m: 'auto',
+                      borderRadius: '6px',
+                      border: '2px dashed lightgrey',
+                    }}
+                    alt="avatar"
+                    src={
+                      urlAvatar
+                        ? urlAvatar
+                        : image
+                        ? process.env.REACT_APP_SERVER_ENDPOINT +
+                          image.attributes.url
+                        : require('../../../src/assets/images/misc/image-placeholder.png')
+                    }
+                    onClick={handleOpenImage}
+                    // className={
+                    //   buttonPressed ? 'input-style-active pointer' : ''
+                    // }
+                  />
+                </Box>
+                <Box>
+                  <FormControl sx={{ m: 1, width: '350px' }} variant="outlined">
+                    <TextField
+                      label="Tên danh mục"
+                      id="update_name"
+                      name="name"
+                      onChange={handleNameChange}
+                      value={name}
+                    />
+                  </FormControl>
+                  <FormControl sx={{ m: 1, width: '350px' }} variant="outlined">
+                    <TextField
+                      label="Mô tả"
+                      id="update_description"
+                      name="description"
+                      onChange={handleDescriptionChange}
+                      value={description}
+                    />
+                  </FormControl>
+                  <FormControl sx={{ m: 1, width: '350px' }} variant="outlined">
+                    <TextField
+                      id="update_parent"
+                      select
+                      name="parent"
+                      label="Danh mục cha"
+                      align="left"
+                      onChange={handleParentChange}
+                      value={parent}
+                    >
+                      {props.categoryData &&
+                        props.categoryData.map((option) => (
+                          <MenuItem key={option.id} value={option.id}>
+                            {option.attributes.name}
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </FormControl>
+                  {/* <FormControl sx={{ m: 1, width: '350px' }} variant="outlined">
+                    <TextField
+                      label="Mã danh mục con"
+                      id="children"
+                      name="children"
+                      onChange={handleInputChange}
+                      value={modifiedData.children}
+                      multiline
+                      maxRows={1}
+                    />
+                  </FormControl> */}
+                  {error}
+                </Box>
+              </Box>
             </CardContent>
             <CardActions sx={{ justifyContent: 'center' }}>
               <Button
