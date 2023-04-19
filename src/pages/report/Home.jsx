@@ -20,9 +20,39 @@ import AddUserModal from './AddUserModal'
 import DeleteReportModal from './DeleteReportModal'
 import PersonIcon from '@mui/icons-material/Person'
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits'
+import { MenuItem, TextField } from '../../../node_modules/@mui/material/index'
 
 export default function category() {
-  const [customer, setCustomer] = React.useState([])
+  const currencies = [
+    {
+      value: 'user',
+      label: 'Người dùng',
+    },
+    {
+      value: 'product',
+      label: 'Sản phẩm',
+    },
+  ]
+  const formatDate = (date) => {
+    const inputDate = new Date(date)
+    const minutes =
+      inputDate.getMinutes() < 10
+        ? `0${inputDate.getMinutes()}`
+        : inputDate.getMinutes()
+
+    return (
+      `${inputDate.getDate().toString().padStart(2, '0')}-${(
+        inputDate.getMonth() + 1
+      )
+        .toString()
+        .padStart(
+          2,
+          '0',
+        )}-${inputDate.getFullYear()} ${inputDate.getHours()}:` + minutes
+    )
+  }
+
+  const [report, setReport] = React.useState([])
   const [elementNum, setElementNum] = React.useState([])
   const [selectedPage, setSelectedPage] = React.useState('')
   const [change, setChange] = React.useState(true)
@@ -37,11 +67,6 @@ export default function category() {
     setSearchedKey(e.target.value)
   }
 
-  // Using for Modal Add user
-  const [openAddUserModal, setOpenAddUserModal] = React.useState(false)
-  const handleOpenAddUserModal = () => setOpenAddUserModal(true)
-  const handleCloseAddUserModal = () => setOpenAddUserModal(false)
-
   // Using for Dialog delete user
   const [userData, setUserData] = React.useState({})
   const [openDeleteReportModal, setOpenDeleteReportModal] =
@@ -53,7 +78,7 @@ export default function category() {
   const handleCloseDeleteReportModal = () => setOpenDeleteReportModal(false)
 
   const handleRefreshBoard = (deletedID) => {
-    setCustomer(customer.filter((item) => item.id !== deletedID))
+    setReport(report.filter((item) => item.id !== deletedID))
     setChange(!change)
     handleCloseDeleteReportModal()
     console.log(deletedID)
@@ -62,20 +87,24 @@ export default function category() {
   //const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
-    const requestUrl = `http://localhost:3000/api/user?_limit=7&_page=${selectedPage}&q=${searchedKey}`
+    const requestUrl =
+      process.env.REACT_APP_API_ENDPOINT +
+      `/reports?pagination[page]=${selectedPage}&pagination[pageSize]=7&populate[product][filters][name][$contains]=${searchedKey}&populate[accused][filters][username][$contains]=${searchedKey}`
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {
-        setCustomer(posts)
+        setReport(posts.data)
       })
   }, [selectedPage, searchedKey, change])
 
   React.useEffect(() => {
-    const requestUrl = `http://localhost:3000/api/user?q=${searchedKey}`
+    const requestUrl =
+      process.env.REACT_APP_API_ENDPOINT +
+      `/reports?populate[product][filters][name][$contains]=${searchedKey}&populate[accused][filters][username][$contains]=${searchedKey}`
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {
-        setElementNum(posts)
+        setElementNum(posts.data)
       })
   }, [searchedKey])
 
@@ -112,47 +141,36 @@ export default function category() {
             />
           </Paper>
         </Box>
-        <Box
-          sx={{ display: 'flex', justifyContent: 'center', margin: '0 10px' }}
+        <TextField
+          id="outlined-select-currency"
+          select
+          label="Lọc báo cáo"
+          sx={{ ml: '16px', width: '170px' }}
+          helpText="wefkhuerfesfsehjfesj"
         >
-          <Button variant="contained" startIcon={<PersonIcon />}>
-            Người dùng
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<ProductionQuantityLimitsIcon />}
-            sx={{ marginLeft: '8px' }}
-          >
-            Sản phẩm
-          </Button>
-          <AddUserModal
-            open={openAddUserModal}
-            onClose={handleCloseAddUserModal}
-          />
-          <DeleteReportModal
-            open={openDeleteReportModal}
-            onClose={handleCloseDeleteReportModal}
-            data={userData}
-            onAfterDelete={handleRefreshBoard}
-          />
-        </Box>
+          {currencies.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
       </Box>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="small" aria-label="simple table">
           <TableHead>
             <TableRow sx={{ backgroundColor: '#1976d2' }}>
-              <TableCell sx={{ color: 'white' }}>Mã</TableCell>
-              <TableCell sx={{ color: 'white' }} align="right">
-                Tên
-              </TableCell>
-              <TableCell sx={{ color: 'white' }} align="right">
-                Mô tả
+              <TableCell sx={{ color: 'white' }}>Mã báo cáo</TableCell>
+              <TableCell sx={{ color: 'white' }} align="center">
+                Loại báo cáo
               </TableCell>
               <TableCell sx={{ color: 'white' }} align="center">
-                Ngày sinh
+                Người báo cáo
               </TableCell>
-              <TableCell sx={{ color: 'white' }} align="right">
-                Giới tính
+              <TableCell sx={{ color: 'white' }} align="center">
+                Mục tiêu bị cáo cáo
+              </TableCell>
+              <TableCell sx={{ color: 'white' }} align="center">
+                Thời gian
               </TableCell>
               <TableCell sx={{ color: 'white' }} align="center">
                 Thao tác
@@ -160,18 +178,38 @@ export default function category() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {customer.map((row) => (
+            {report.map((row) => (
               <TableRow
-                key={row.name}
+                key={row.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
                   {row.id}
                 </TableCell>
-                <TableCell align="right">{row.name}</TableCell>
-                <TableCell align="right">{row.birthday}</TableCell>
-                <TableCell align="center">{row.sex}</TableCell>
-                <TableCell align="right">{row.email}</TableCell>
+                <TableCell align="center">
+                  {row.attributes?.type === 'user' ? 'Người dùng' : 'Sản phẩm'}
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{
+                    color:
+                      row.attributes?.reporter?.data === undefined
+                        ? 'lightgrey'
+                        : '',
+                  }}
+                >
+                  {row.attributes?.reporter?.data === undefined
+                    ? 'Không có dữ liệu'
+                    : row.attributes?.reporter.data?.attributes.username}
+                </TableCell>
+                <TableCell align="center">
+                  {row.attributes?.accused?.data === undefined
+                    ? row.attributes.product.data?.attributes.name
+                    : row.attributes.accused.data?.attributes.username}
+                </TableCell>
+                <TableCell align="center">
+                  {formatDate(row.attributes.createdAt)}
+                </TableCell>
                 <TableCell align="center">
                   <IconButton color="primary">
                     <RemoveRedEyeIcon />
