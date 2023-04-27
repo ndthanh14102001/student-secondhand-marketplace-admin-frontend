@@ -14,3 +14,9 @@ Patch Note:
 [1.2.1 - 11/04/2023]
 - Reconstruct code
 - CRUD in category will now immidiately update to table
+
+[1.3 - 13/04/2023]
+- Add report management
+
+[1.4 -13/04/2023]
+- Fix bug & improve report management's filter can't accept value from its options

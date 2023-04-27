@@ -9,14 +9,16 @@ import Paper from '@mui/material/Paper'
 import { Box } from '@mui/system'
 import Pagination from '@mui/material/Pagination'
 import InputBase from '@mui/material/InputBase'
-import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 
 // Icon import
 import SearchIcon from '@mui/icons-material/Search'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import LoginIcon from '@mui/icons-material/Login'
 import WarningIcon from '@mui/icons-material/Warning'
-import AddUserModal from './AddUserModal'
+import DeleteIcon from '@mui/icons-material/Delete'
+
+import TargetDetailModal from './TargetDetailModal'
 import DeleteReportModal from './DeleteReportModal'
 import PersonIcon from '@mui/icons-material/Person'
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits'
@@ -33,6 +35,7 @@ export default function category() {
       label: 'Sản phẩm',
     },
   ]
+
   const formatDate = (date) => {
     const inputDate = new Date(date)
     const minutes =
@@ -57,56 +60,70 @@ export default function category() {
   const [selectedPage, setSelectedPage] = React.useState('')
   const [change, setChange] = React.useState(true)
 
+  const [openTargetDetailInfo, setOpenTargetDetailInfo] = React.useState(false)
+  const [selectedAccused, setSelectedAccused] = React.useState()
+  const [selectedType, setSelectedType] = React.useState()
+  const [selectedName, setSelectedName] = React.useState('None')
+
+  const [selectedTarget, setSelectedTarget] = React.useState()
+  const [openDeleteReportModal, setOpenDeleteReportModal] =
+    React.useState(false)
+
   const handleGetPage = (event, elementNum) => {
     setSelectedPage(elementNum)
   }
 
   const [searchedKey, setSearchedKey] = React.useState('')
+  const [filter, setFilter] = React.useState('all')
 
   const handleGetSearch = (e) => {
     setSearchedKey(e.target.value)
   }
 
   // Using for Dialog delete user
-  const [userData, setUserData] = React.useState({})
-  const [openDeleteReportModal, setOpenDeleteReportModal] =
-    React.useState(false)
-  const handleOpenDeleteReportModal = (data) => {
-    setOpenDeleteReportModal(true)
-    setUserData(data)
+  const handleOpenDeleteReportModal = (item) => {
+    setOpenDeleteReportModal((prev) => !prev)
+    setSelectedTarget(item)
   }
   const handleCloseDeleteReportModal = () => setOpenDeleteReportModal(false)
 
-  const handleRefreshBoard = (deletedID) => {
-    setReport(report.filter((item) => item.id !== deletedID))
+  const handleRefreshBoard = () => {
+    setOpenDeleteReportModal(false)
     setChange(!change)
-    handleCloseDeleteReportModal()
-    console.log(deletedID)
   }
 
   //const [open, setOpen] = React.useState(false);
 
-  React.useEffect(() => {
-    const requestUrl =
-      process.env.REACT_APP_API_ENDPOINT +
-      `/reports?pagination[page]=${selectedPage}&pagination[pageSize]=7&populate[product][filters][name][$contains]=${searchedKey}&populate[accused][filters][username][$contains]=${searchedKey}`
-    fetch(requestUrl)
-      .then((res) => res.json())
-      .then((posts) => {
-        setReport(posts.data)
-      })
-  }, [selectedPage, searchedKey, change])
+  const handleOpenTargetDetailInfo = (item) => {
+    setOpenTargetDetailInfo((prev) => !prev)
+    setSelectedAccused(item.id)
+    setSelectedType(item.type)
+  }
 
   React.useEffect(() => {
     const requestUrl =
       process.env.REACT_APP_API_ENDPOINT +
-      `/reports?populate[product][filters][name][$contains]=${searchedKey}&populate[accused][filters][username][$contains]=${searchedKey}`
+      `/reports?pagination[page]=${selectedPage}&pagination[pageSize]=7&filters[$or][0][product][name][$contains]=${searchedKey}&filters[$or][1][accused][username][$contains]=${searchedKey}&populate=*` +
+      (filter !== 'all' ? `&filters[type][$eq]=${filter}` : ``)
+    fetch(requestUrl)
+      .then((res) => res.json())
+      .then((posts) => {
+        setReport(posts.data)
+        console.log(posts.data)
+      })
+  }, [selectedPage, searchedKey, change, filter])
+
+  React.useEffect(() => {
+    const requestUrl =
+      process.env.REACT_APP_API_ENDPOINT +
+      `/reports?filters[$or][0][product][name][$contains]=${searchedKey}&filters[$or][1][accused][username][$contains]=${searchedKey}&populate=*` +
+      (filter !== 'all' ? `&filters[type][$eq]=${filter}` : ``)
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {
         setElementNum(posts.data)
       })
-  }, [searchedKey])
+  }, [searchedKey, filter, change])
 
   return (
     <Box
@@ -140,14 +157,40 @@ export default function category() {
               inputProps={{ 'aria-label': 'search google maps' }}
             />
           </Paper>
+          <Box className="CRUDToolHere">
+            {selectedAccused && (
+              <TargetDetailModal
+                open={openTargetDetailInfo}
+                onClose={handleOpenTargetDetailInfo}
+                targetID={selectedAccused}
+                targetType={selectedType}
+                onHandle={() => {
+                  setOpenTargetDetailInfo(false)
+                }}
+              />
+            )}
+            {selectedTarget && (
+              <DeleteReportModal
+                open={openDeleteReportModal}
+                onClose={handleCloseDeleteReportModal}
+                targetData={selectedTarget}
+                onHandle={handleRefreshBoard}
+              />
+            )}
+          </Box>
         </Box>
         <TextField
           id="outlined-select-currency"
           select
           label="Lọc báo cáo"
           sx={{ ml: '16px', width: '170px' }}
-          helpText="wefkhuerfesfsehjfesj"
+          onChange={(event) => {
+            setFilter(event.target.value)
+          }}
         >
+          <MenuItem key={'all'} value={'all'}>
+            Tất cả
+          </MenuItem>
           {currencies.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
@@ -178,7 +221,7 @@ export default function category() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {report.map((row) => (
+            {report.map((row, index) => (
               <TableRow
                 key={row.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -203,7 +246,7 @@ export default function category() {
                     : row.attributes?.reporter.data?.attributes.username}
                 </TableCell>
                 <TableCell align="center">
-                  {row.attributes?.accused?.data === undefined
+                  {row.attributes?.type === 'product'
                     ? row.attributes.product.data?.attributes.name
                     : row.attributes.accused.data?.attributes.username}
                 </TableCell>
@@ -211,14 +254,49 @@ export default function category() {
                   {formatDate(row.attributes.createdAt)}
                 </TableCell>
                 <TableCell align="center">
-                  <IconButton color="primary">
-                    <RemoveRedEyeIcon />
+                  <IconButton
+                    color="primary"
+                    onClick={() =>
+                      handleOpenTargetDetailInfo(
+                        row.attributes?.type === 'product'
+                          ? {
+                              id: row.attributes.product.data?.id,
+                              type: 'product',
+                              name: row.attributes.product.data?.attributes
+                                .name,
+                            }
+                          : {
+                              id: row.attributes.accused.data?.id,
+                              type: 'user',
+                              name: row.attributes.accused.data?.attributes
+                                .username,
+                            },
+                      )
+                    }
+                  >
+                    <LoginIcon />
                   </IconButton>
                   <IconButton
                     color="error"
-                    onClick={() => handleOpenDeleteReportModal(row)}
+                    onClick={() =>
+                      handleOpenDeleteReportModal(
+                        row.attributes?.type === 'product'
+                          ? {
+                              id: row.id,
+                              type: 'product',
+                              name: row.attributes.product.data?.attributes
+                                .name,
+                            }
+                          : {
+                              id: row.id,
+                              type: 'user',
+                              name: row.attributes.accused.data?.attributes
+                                .username,
+                            },
+                      )
+                    }
                   >
-                    <WarningIcon />
+                    <DeleteIcon />
                   </IconButton>
                 </TableCell>
               </TableRow>

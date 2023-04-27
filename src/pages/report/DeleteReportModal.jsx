@@ -5,52 +5,85 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import { Alert, Snackbar } from '../../../node_modules/@mui/material/index'
+import axios from '../../../node_modules/axios/index'
 
 export default function DeleteReportModal(props) {
-  const deleteCustomerByID = async (id) => {
-    const requestUrl = 'http://localhost:3000/api/user/' + id
-    const response = await fetch(requestUrl, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await response.json()
+  // Thông báo snackbar
+  const [openSuccessSnackbar, setOpenSuccessSnackbar] = React.useState(false)
+  const [openErrorSnackbar, setOpenErrorSnackbar] = React.useState(false)
+  const [targetText, setTargetText] = React.useState()
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
+    }
 
-    console.log(data)
+    setOpenSuccessSnackbar(false)
+    setOpenErrorSnackbar(false)
   }
 
-  const deleteCustomer = (id) => {
-    deleteCustomerByID(id)
-    props.onAfterDelete(id)
+  const deleteCustomerByID = async (id) => {
+    axios
+      .delete(process.env.REACT_APP_API_ENDPOINT + '/reports/' + id, {
+        data: { blocked: true },
+      })
+      .then((response) => {
+        setOpenSuccessSnackbar(true)
+        console.log(response)
+        props.onHandle()
+      })
+      .catch((error) => {
+        setOpenErrorSnackbar(true)
+      })
   }
 
   return (
-    <Dialog
-      open={props.open}
-      onClose={props.onClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle id="alert-dialog-title">
-        {'Xác nhận xóa người dùng?'}
-      </DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          Bạn có chắc muốn xóa người dùng "{props.data.name}" này không ?
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={props.onClose}>Thoát</Button>
-        <Button
-          color="error"
-          variant="outlined"
-          onClick={() => deleteCustomer(props.data.id)}
-          autoFocus
-        >
-          Xóa
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <div>
+      <Dialog
+        open={props.open}
+        onClose={props.onClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {'Xác nhận xóa tố cáo?'}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`Bạn có chắc muốn xóa tố cáo ${
+              props.targetData.type === 'product' ? 'sản phẩm' : 'người dùng'
+            } ${props.targetData.name} không ?`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={props.onClose}>Thoát</Button>
+          <Button
+            color="error"
+            variant="outlined"
+            onClick={() => deleteCustomerByID(props.targetData.id)}
+          >
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={openSuccessSnackbar}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+          Xóa tố cáo thành công
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openErrorSnackbar}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+          Xóa tố cáo thất bại
+        </Alert>
+      </Snackbar>
+    </div>
   )
 }
