@@ -71,7 +71,6 @@ export default function category() {
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {
-        console.log('đã được gọi')
         setCustomer(posts.data)
       })
   }
@@ -240,7 +239,7 @@ export default function category() {
                 </TableCell>
                 <TableCell align="center">{row.attributes.name}</TableCell>
                 <TableCell
-                  align="right"
+                  align="left"
                   sx={{
                     color: row.attributes.description ? 'black' : 'lightgrey',
                   }}

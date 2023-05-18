@@ -74,15 +74,15 @@ const MainRoutes = {
         },
       ],
     },
-    {
-      path: 'chat',
-      children: [
-        {
-          path: 'default',
-          element: <Chat />,
-        },
-      ],
-    },
+    // {
+    //   path: 'chat',
+    //   children: [
+    //     {
+    //       path: 'default',
+    //       element: <Chat />,
+    //     },
+    //   ],
+    // },
     // {
     //   path: 'sample-page',
     //   element: <SamplePage />,

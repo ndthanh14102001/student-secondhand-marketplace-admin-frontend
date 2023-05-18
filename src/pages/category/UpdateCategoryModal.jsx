@@ -203,14 +203,29 @@ export default function UpdateCategoryModal(props) {
             </Typography>
             <CardContent align="center">
               <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <Box sx={{ display: 'flex' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginRight: '8px',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      color: 'grey',
+                      fontSize: '11px',
+                    }}
+                  >
+                    Ảnh danh mục
+                  </Box>
                   <Avatar
                     sx={{
                       width: 150,
                       height: 150,
                       m: 'auto',
                       borderRadius: '6px',
-                      border: '2px dashed lightgrey',
+                      border: '1px dashed grey',
+                      padding: '3px',
                     }}
                     alt="avatar"
                     src={
@@ -226,9 +241,12 @@ export default function UpdateCategoryModal(props) {
                     //   buttonPressed ? 'input-style-active pointer' : ''
                     // }
                   />
+                  <Box sx={{ color: 'grey', fontSize: '11px' }}>
+                    Ấn vào ảnh để thay ảnh
+                  </Box>
                 </Box>
                 <Box>
-                  <FormControl sx={{ m: 1, width: '350px' }} variant="outlined">
+                  <FormControl sx={{ m: 1, width: '345px' }} variant="outlined">
                     <TextField
                       label="Tên danh mục"
                       id="update_name"
@@ -237,7 +255,7 @@ export default function UpdateCategoryModal(props) {
                       value={name}
                     />
                   </FormControl>
-                  <FormControl sx={{ m: 1, width: '350px' }} variant="outlined">
+                  <FormControl sx={{ m: 1, width: '345px' }} variant="outlined">
                     <TextField
                       label="Mô tả"
                       id="update_description"
@@ -246,7 +264,7 @@ export default function UpdateCategoryModal(props) {
                       value={description}
                     />
                   </FormControl>
-                  <FormControl sx={{ m: 1, width: '350px' }} variant="outlined">
+                  <FormControl sx={{ m: 1, width: '345px' }} variant="outlined">
                     <TextField
                       id="update_parent"
                       select

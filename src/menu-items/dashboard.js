@@ -46,14 +46,14 @@ const dashboard = {
       icon: WarningOutlined,
       breadcrumbs: false,
     },
-    {
-      id: 'chat',
-      title: 'Chat',
-      type: 'item',
-      url: '/chat/default',
-      icon: WechatOutlined,
-      breadcrumbs: false,
-    },
+    // {
+    //   id: 'chat',
+    //   title: 'Chat',
+    //   type: 'item',
+    //   url: '/chat/default',
+    //   icon: WechatOutlined,
+    //   breadcrumbs: false,
+    // },
   ],
 }
 

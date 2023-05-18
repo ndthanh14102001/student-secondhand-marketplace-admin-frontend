@@ -11,10 +11,15 @@ import CardActions from '@mui/material/CardActions'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
+import ClearIcon from '@mui/icons-material/Clear'
+import BeenhereIcon from '@mui/icons-material/Beenhere'
+import PersonOffIcon from '@mui/icons-material/PersonOff'
+
 import {
   Alert,
   Avatar,
   Box,
+  IconButton,
   Snackbar,
 } from '../../../node_modules/@mui/material/index'
 import axios from '../../../node_modules/axios/index'
@@ -60,11 +65,22 @@ export default function TargetDetailModal(props) {
   }
 
   const handleReportUser = () => {
-    setTargetText('người dùng ' + targetData.username)
+    setTargetText(
+      'người dùng ' + props.targetType === 'product'
+        ? targetData.attributes.userId.data.attributes.username
+        : targetData.username,
+    )
     axios
-      .put(process.env.REACT_APP_API_ENDPOINT + '/users/' + targetData.id, {
-        data: { blocked: true },
-      })
+      .put(
+        process.env.REACT_APP_API_ENDPOINT +
+          '/users/' +
+          (props.targetType === 'product'
+            ? targetData.attributes.userId.data.id
+            : targetData.id),
+        {
+          data: { blocked: true },
+        },
+      )
       .then((response) => {
         setOpenSuccessSnackbar(true)
         props.onHandle()
@@ -133,6 +149,20 @@ export default function TargetDetailModal(props) {
                 position: 'relative',
               }}
             >
+              <Box
+                sx={{
+                  position: 'absolute',
+                  width: '100%',
+                  textAlign: 'right',
+                  right: '8px',
+                  top: '7px',
+                }}
+              >
+                <IconButton color="error" onClick={props.onClose}>
+                  <ClearIcon />
+                </IconButton>
+                {'  '}
+              </Box>
               <Typography variant="h5" align="center">
                 Thông tin người dùng
               </Typography>
@@ -189,10 +219,10 @@ export default function TargetDetailModal(props) {
                   variant="contained"
                   sx={{ marginRight: '20px', textTransform: 'lowercase' }}
                   color="error"
-                  startIcon={<RemoveCircleIcon />}
+                  startIcon={<PersonOffIcon />}
                   onClick={handleReportUser}
                 >
-                  Chặn tài khoản
+                  Chặn người dùng
                 </Button>
               </CardActions>
             </Card>
@@ -257,18 +287,21 @@ export default function TargetDetailModal(props) {
                   <Box sx={{ marginBottom: '8px' }}>
                     Giá thành: {targetData?.attributes.price}
                   </Box>
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Mô tả sản phẩm: {!targetData?.attributes.description}
-                  </Box>
+                  {/* <Box sx={{ marginBottom: '8px', textAlign: 'left' }}>
+                    Mô tả sản phẩm: {targetData?.attributes.description}
+                  </Box> */}
                   <Box sx={{ marginBottom: '8px' }}>
                     Trạng thái sản phẩm:{' '}
                     {targetData?.attributes.status === 'onSale'
                       ? 'Còn bán'
-                      : 'Hết hàng'}
+                      : 'Ngưng bán'}
                   </Box>
                   {/* <Box sx={{ marginBottom: '8px' }}>
                       Địa chỉ: {targetData?.address}
                     </Box> */}
+                  <Box sx={{ marginBottom: '8px', textAlign: 'left' }}>
+                    Lý do: {props.selectedData.description}
+                  </Box>
                 </Box>
               </CardContent>
               <CardActions sx={{ justifyContent: 'center' }}>
@@ -280,6 +313,15 @@ export default function TargetDetailModal(props) {
                   onClick={handleReportProduct}
                 >
                   Ngưng bán sản phẩm
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{ marginRight: '20px', textTransform: 'lowercase' }}
+                  color="error"
+                  startIcon={<PersonOffIcon />}
+                  onClick={handleReportUser}
+                >
+                  Chặn người dùng
                 </Button>
               </CardActions>
             </Card>

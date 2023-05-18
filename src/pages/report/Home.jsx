@@ -17,12 +17,20 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import LoginIcon from '@mui/icons-material/Login'
 import WarningIcon from '@mui/icons-material/Warning'
 import DeleteIcon from '@mui/icons-material/Delete'
+import BeenhereIcon from '@mui/icons-material/Beenhere'
 
 import TargetDetailModal from './TargetDetailModal'
 import DeleteReportModal from './DeleteReportModal'
-import PersonIcon from '@mui/icons-material/Person'
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits'
-import { MenuItem, TextField } from '../../../node_modules/@mui/material/index'
+import BlockIcon from '@mui/icons-material/Block'
+import {
+  Link,
+  MenuItem,
+  TextField,
+  Tooltip,
+} from '../../../node_modules/@mui/material/index'
+import InventoryIcon from '@mui/icons-material/Inventory'
+import PersonIcon from '@mui/icons-material/Person'
 
 export default function category() {
   const currencies = [
@@ -63,6 +71,7 @@ export default function category() {
   const [openTargetDetailInfo, setOpenTargetDetailInfo] = React.useState(false)
   const [selectedAccused, setSelectedAccused] = React.useState()
   const [selectedType, setSelectedType] = React.useState()
+  const [selectedData, setSelectedData] = React.useState()
   const [selectedName, setSelectedName] = React.useState('None')
 
   const [selectedTarget, setSelectedTarget] = React.useState()
@@ -98,6 +107,7 @@ export default function category() {
     setOpenTargetDetailInfo((prev) => !prev)
     setSelectedAccused(item.id)
     setSelectedType(item.type)
+    setSelectedData(item)
   }
 
   React.useEffect(() => {
@@ -143,7 +153,7 @@ export default function category() {
               p: '2px 4px',
               display: 'flex',
               alignItems: 'center',
-              width: '300px',
+              width: '360px',
             }}
           >
             <IconButton sx={{ p: '10px' }} aria-label="menu">
@@ -153,7 +163,7 @@ export default function category() {
               sx={{ ml: 1, flex: 1 }}
               value={searchedKey}
               onChange={handleGetSearch}
-              placeholder="Tìm kiếm theo tên, mã danh mục"
+              placeholder="Tìm kiếm theo người / sản phẩm (bị) tố cáo"
               inputProps={{ 'aria-label': 'search google maps' }}
             />
           </Paper>
@@ -164,6 +174,7 @@ export default function category() {
                 onClose={handleOpenTargetDetailInfo}
                 targetID={selectedAccused}
                 targetType={selectedType}
+                selectedData={selectedData}
                 onHandle={() => {
                   setOpenTargetDetailInfo(false)
                 }}
@@ -216,6 +227,9 @@ export default function category() {
                 Thời gian
               </TableCell>
               <TableCell sx={{ color: 'white' }} align="center">
+                Lý do
+              </TableCell>
+              <TableCell sx={{ color: 'white' }} align="center">
                 Thao tác
               </TableCell>
             </TableRow>
@@ -230,10 +244,45 @@ export default function category() {
                   {row.id}
                 </TableCell>
                 <TableCell align="center">
-                  {row.attributes?.type === 'user' ? 'Người dùng' : 'Sản phẩm'}
+                  {row.attributes?.type === 'user' ? (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        padding: '3px',
+                        color: 'darkblue',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        backgroundColor: 'lightblue',
+                        fontSize: '13px',
+                      }}
+                    >
+                      <PersonIcon sx={{ mr: '6px', fontSize: '14px' }} />
+                      Người dùng
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        padding: '3px',
+                        color: 'green',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        backgroundColor: 'lightgreen',
+                      }}
+                    >
+                      <InventoryIcon sx={{ mr: 1, fontSize: '14px' }} />
+                      Sản phẩm
+                    </Box>
+                  )}
                 </TableCell>
                 <TableCell
-                  align="center"
+                  align="left"
                   sx={{
                     color:
                       row.attributes?.reporter?.data === undefined
@@ -245,59 +294,91 @@ export default function category() {
                     ? 'Không có dữ liệu'
                     : row.attributes?.reporter.data?.attributes.username}
                 </TableCell>
-                <TableCell align="center">
-                  {row.attributes?.type === 'product'
-                    ? row.attributes.product.data?.attributes.name
-                    : row.attributes.accused.data?.attributes.username}
+                <TableCell align="left">
+                  <Link href="#" underline="none">
+                    {row.attributes?.type === 'product'
+                      ? row.attributes.product.data?.attributes.name
+                      : row.attributes.accused.data?.attributes.username}
+                  </Link>
                 </TableCell>
                 <TableCell align="center">
                   {formatDate(row.attributes.createdAt)}
                 </TableCell>
+                <TableCell
+                  align="left"
+                  sx={{
+                    maxWidth: '360px',
+                    color: !row.attributes.description ? 'lightgrey' : '',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      width: '280px',
+                    }}
+                  >
+                    {row.attributes.description
+                      ? row.attributes.description?.length > 30
+                        ? row.attributes.description.substring(0, 30) + '...'
+                        : row.attributes.description
+                      : 'Chưa rõ lý do'}
+                  </Box>
+                </TableCell>
                 <TableCell align="center">
-                  <IconButton
-                    color="primary"
-                    onClick={() =>
-                      handleOpenTargetDetailInfo(
-                        row.attributes?.type === 'product'
-                          ? {
-                              id: row.attributes.product.data?.id,
-                              type: 'product',
-                              name: row.attributes.product.data?.attributes
-                                .name,
-                            }
-                          : {
-                              id: row.attributes.accused.data?.id,
-                              type: 'user',
-                              name: row.attributes.accused.data?.attributes
-                                .username,
-                            },
-                      )
-                    }
-                  >
-                    <LoginIcon />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() =>
-                      handleOpenDeleteReportModal(
-                        row.attributes?.type === 'product'
-                          ? {
-                              id: row.id,
-                              type: 'product',
-                              name: row.attributes.product.data?.attributes
-                                .name,
-                            }
-                          : {
-                              id: row.id,
-                              type: 'user',
-                              name: row.attributes.accused.data?.attributes
-                                .username,
-                            },
-                      )
-                    }
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  <Tooltip title="Duyệt tố cáo">
+                    <IconButton
+                      color="primary"
+                      sx={{ m: '0 4px' }}
+                      onClick={() =>
+                        handleOpenTargetDetailInfo(
+                          row.attributes?.type === 'product'
+                            ? {
+                                id: row.attributes.product.data?.id,
+                                type: 'product',
+                                name: row.attributes.product.data?.attributes
+                                  .name,
+                                description: row.attributes.description,
+                              }
+                            : {
+                                id: row.attributes.accused.data?.id,
+                                type: 'user',
+                                name: row.attributes.accused.data?.attributes
+                                  .username,
+                                description: row.attributes.description,
+                              },
+                        )
+                      }
+                    >
+                      <LoginIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Đánh dấu đã duyệt">
+                    <IconButton
+                      color="info"
+                      sx={{ m: '0 4px' }}
+                      onClick={() =>
+                        handleOpenDeleteReportModal(
+                          row.attributes?.type === 'product'
+                            ? {
+                                id: row.id,
+                                type: 'product',
+                                name: row.attributes.product.data?.attributes
+                                  .name,
+                              }
+                            : {
+                                id: row.id,
+                                type: 'user',
+                                name: row.attributes.accused.data?.attributes
+                                  .username,
+                              },
+                        )
+                      }
+                    >
+                      <BeenhereIcon />
+                    </IconButton>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
