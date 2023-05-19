@@ -14,12 +14,18 @@ import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
 import ClearIcon from '@mui/icons-material/Clear'
 import BeenhereIcon from '@mui/icons-material/Beenhere'
 import PersonOffIcon from '@mui/icons-material/PersonOff'
+import NearMeIcon from '@mui/icons-material/NearMe'
+import PersonIcon from '@mui/icons-material/Person'
+import WarningRoundedIcon from '@mui/icons-material/WarningRounded'
+import AccessTimeFilledRoundedIcon from '@mui/icons-material/AccessTimeFilledRounded'
+import AssessmentRoundedIcon from '@mui/icons-material/AssessmentRounded'
 
 import {
   Alert,
   Avatar,
   Box,
   IconButton,
+  Link,
   Snackbar,
 } from '../../../node_modules/@mui/material/index'
 import axios from '../../../node_modules/axios/index'
@@ -33,7 +39,9 @@ import axios from '../../../node_modules/axios/index'
 */
 export default function TargetDetailModal(props) {
   const [targetData, setTargetData] = React.useState()
+  const [targetReport, setTargetReport] = React.useState()
   const [urlAvatar, setUrlAvatar] = React.useState()
+  const [reportList, setReportList] = React.useState()
 
   // Thông báo snackbar
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = React.useState(false)
@@ -48,16 +56,31 @@ export default function TargetDetailModal(props) {
     setOpenErrorSnackbar(false)
   }
 
+  React.useEffect(() => {
+    setTargetReport(props.targetReport)
+    setReportList(props.reportList)
+  }, [props])
   const handleReportProduct = () => {
     setTargetText('sản phẩm ' + targetData.attributes.name)
     axios
       .put(process.env.REACT_APP_API_ENDPOINT + '/products/' + targetData.id, {
         data: { status: 'Sold' },
       })
-      .then((response) => {
-        setOpenSuccessSnackbar(true)
-        props.onHandle()
-        console.log(response)
+      .then(() => {
+        axios
+          .put(
+            process.env.REACT_APP_API_ENDPOINT +
+              '/reports/' +
+              props.targetReport.id,
+            {
+              data: { processingStatus: 'Complete' },
+            },
+          )
+          .then((response) => {
+            setOpenSuccessSnackbar(true)
+            props.onHandle()
+            console.log(response)
+          })
       })
       .catch((error) => {
         setOpenErrorSnackbar(true)
@@ -81,10 +104,21 @@ export default function TargetDetailModal(props) {
           data: { blocked: true },
         },
       )
-      .then((response) => {
-        setOpenSuccessSnackbar(true)
-        props.onHandle()
-        console.log(response)
+      .then(() => {
+        axios
+          .put(
+            process.env.REACT_APP_API_ENDPOINT +
+              '/reports/' +
+              props.targetReport.id,
+            {
+              data: { processingStatus: 'Complete' },
+            },
+          )
+          .then((response) => {
+            setOpenSuccessSnackbar(true)
+            props.onHandle()
+            console.log(response)
+          })
       })
       .catch((error) => {
         setOpenErrorSnackbar(true)
@@ -123,6 +157,507 @@ export default function TargetDetailModal(props) {
     }
   }, [props])
 
+  const UserInfoCard = (props) => {
+    return (
+      <Box>
+        <Box
+          sx={{
+            position: 'absolute',
+            width: '100%',
+            textAlign: 'right',
+            right: '8px',
+            top: '7px',
+          }}
+        >
+          <IconButton color="error" onClick={props.onClose}>
+            <ClearIcon />
+          </IconButton>
+          {'  '}
+        </Box>
+        <Typography variant="h5" align="center" sx={{ mb: '8px' }}>
+          Thông tin tố cáo
+        </Typography>
+        <CardContent
+          align="center"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            background: '#eeeeee',
+            border: 'lightgrey 1px solid',
+            borderRadius: '15px',
+            mt: '10px',
+          }}
+        >
+          <Typography variant="h5" align="center" sx={{ mb: '8px' }}>
+            Thông tin người dùng
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+            <Box>
+              <Avatar
+                src={
+                  urlAvatar !== undefined &&
+                  `${process.env.REACT_APP_SERVER_ENDPOINT}${urlAvatar}`
+                }
+                alt={'abc'}
+                sx={{
+                  width: '140px',
+                  height: '140px',
+                  border: '1px solid #ccc',
+                }}
+              />
+            </Box>
+            <Box
+              className="DetailedInfoUser"
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'baseline',
+                width: '100%',
+                marginLeft: '30px',
+              }}
+            >
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Họ tên: {targetData?.fullName}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Username: {targetData?.username}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Email: {targetData?.email}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Trạng thái tài khoản: {!targetData?.blocked}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Trường: {targetData?.university}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Địa chỉ: {targetData?.address}
+              </Box>
+            </Box>
+          </Box>
+        </CardContent>
+        <CardContent
+          align="center"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            background: '#eeeeee',
+            border: 'lightgrey 1px solid',
+            borderRadius: '15px',
+            mt: '15px',
+          }}
+        >
+          <Typography variant="h5" align="center" sx={{ mb: '8px' }}>
+            Thông tin tố cáo
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+            <Box
+              className="DetailedInfoUser"
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'baseline',
+                width: '100%',
+                marginLeft: '30px',
+              }}
+            >
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <PersonIcon sx={{ fontSize: '20px', mr: '8px' }} />
+                {' Người tố cáo: '}
+                {targetReport.attributes?.reporter.data?.attributes.username}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <WarningRoundedIcon sx={{ fontSize: '20px', mr: '8px' }} />
+                {' Thời gian: '}
+                {targetReport?.attributes?.createdAt}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <AccessTimeFilledRoundedIcon
+                  sx={{ fontSize: '20px', mr: '8px' }}
+                />
+                {' Lý do: '}
+                {targetReport?.attributes?.description}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <AssessmentRoundedIcon sx={{ fontSize: '20px', mr: '8px' }} />
+                {' Số lượng tố cáo người dùng này: '}
+                {
+                  reportList?.filter((object) => {
+                    console.log(object)
+                    return (
+                      object.attributes.accused?.data?.id ===
+                      targetReport.attributes.accused?.data?.id
+                    )
+                  }).length
+                }
+              </Box>
+            </Box>
+          </Box>
+        </CardContent>
+        <CardActions sx={{ justifyContent: 'center', mt: '12px' }}>
+          <Link
+            href={
+              process.env.REACT_APP_PUBLIC_ECOMMERCE_URL +
+              'user/info/' +
+              targetData?.id
+            }
+            underline="none"
+            target="_blank"
+          >
+            <Button
+              variant="contained"
+              sx={{ marginRight: '20px', textTransform: 'lowercase' }}
+              color="info"
+              startIcon={<NearMeIcon />}
+            >
+              Chi tiết người dùng
+            </Button>
+          </Link>
+          <Button
+            variant="contained"
+            sx={{ marginRight: '20px', textTransform: 'lowercase' }}
+            color="error"
+            startIcon={<PersonOffIcon />}
+            onClick={handleReportUser}
+          >
+            Chặn người dùng
+          </Button>
+        </CardActions>
+      </Box>
+    )
+  }
+
+  const ProductInfoCard = (props) => {
+    return (
+      <Box>
+        <Box
+          sx={{
+            position: 'absolute',
+            width: '100%',
+            textAlign: 'right',
+            right: '8px',
+            top: '7px',
+          }}
+        >
+          <IconButton color="error" onClick={props.onClose}>
+            <ClearIcon />
+          </IconButton>
+          {'  '}
+        </Box>
+        <Typography variant="h5" align="center">
+          Thông tin tố cáo
+        </Typography>
+        <CardContent
+          align="center"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            background: '#eeeeee',
+            border: 'lightgrey 1px solid',
+            borderRadius: '15px',
+            mt: '10px',
+          }}
+        >
+          <Typography variant="h5" align="center" sx={{ mb: '8px' }}>
+            Thông tin sản phẩm
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+            <Box>
+              <Avatar
+                src={
+                  urlAvatar !== undefined &&
+                  `${process.env.REACT_APP_SERVER_ENDPOINT}${urlAvatar}`
+                }
+                alt={'abc'}
+                sx={{
+                  width: '140px',
+                  height: '140px',
+                  border: '1px solid #ccc',
+                }}
+              />
+              <Box sx={{ color: 'grey', width: '160px' }}>
+                Tổng cộng có:
+                <Box sx={{ ml: '5px', display: 'inline-block' }}>
+                  {targetData?.attributes?.images.data.length}
+                </Box>{' '}
+                hình ảnh
+              </Box>
+            </Box>
+            <Box
+              className="DetailedInfoUser"
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'baseline',
+                width: '100%',
+                marginLeft: '30px',
+              }}
+            >
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                ID sản phẩm: {targetData?.id}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Tên sản phẩm: {targetData?.attributes.name}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Danh mục: {targetData?.attributes.category.data.attributes.name}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Giá thành: {targetData?.attributes.price}
+              </Box>
+              {/* <Box sx={{ marginBottom: '8px', textAlign: 'left', alignItems: 'center', display: 'flex' }}>
+                Mô tả sản phẩm: {targetData?.attributes.description}
+              </Box> */}
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                Trạng thái sản phẩm:{' '}
+                {targetData?.attributes.status === 'onSale'
+                  ? 'Còn bán'
+                  : 'Ngưng bán'}
+              </Box>
+              {/* <Box sx={{ marginBottom: '8px', textAlign: 'left', alignItems: 'center', display: 'flex' }}>
+                  Địa chỉ: {targetData?.address}
+                </Box> */}
+            </Box>
+          </Box>
+        </CardContent>
+        <CardContent
+          align="center"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            background: '#eeeeee',
+            border: 'lightgrey 1px solid',
+            borderRadius: '15px',
+            mt: '15px',
+          }}
+        >
+          <Typography variant="h5" align="center" sx={{ mb: '8px' }}>
+            Thông tin tố cáo
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+            <Box
+              className="DetailedInfoUser"
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'baseline',
+                width: '100%',
+                marginLeft: '30px',
+              }}
+            >
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <PersonIcon sx={{ fontSize: '20px', mr: '8px' }} />
+                {' Người tố cáo: '}
+                {targetReport.attributes?.reporter.data?.attributes.username}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <WarningRoundedIcon sx={{ fontSize: '20px', mr: '8px' }} />
+                {' Thời gian: '}
+                {targetReport?.attributes?.createdAt}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <AccessTimeFilledRoundedIcon
+                  sx={{ fontSize: '20px', mr: '8px' }}
+                />
+                {' Lý do: '}
+                {targetReport?.attributes?.description}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: '8px',
+                  textAlign: 'left',
+                  alignItems: 'center',
+                  display: 'flex',
+                }}
+              >
+                <AssessmentRoundedIcon sx={{ fontSize: '20px', mr: '8px' }} />
+                {' Số lượng tố cáo người dùng này: '}
+                {
+                  reportList?.filter((object) => {
+                    console.log(object)
+                    return (
+                      object.attributes.product?.data?.id ===
+                      targetReport.attributes.product?.data?.id
+                    )
+                  }).length
+                }
+              </Box>
+            </Box>
+          </Box>
+        </CardContent>
+        <CardActions sx={{ justifyContent: 'center', mt: '12px' }}>
+          <Link
+            href={
+              process.env.REACT_APP_PUBLIC_ECOMMERCE_URL +
+              'product/' +
+              targetData?.id
+            }
+            underline="none"
+            target="_blank"
+          >
+            <Button
+              variant="contained"
+              sx={{ marginRight: '20px', textTransform: 'lowercase' }}
+              color="info"
+              startIcon={<NearMeIcon />}
+            >
+              Chi tiết sản phẩm
+            </Button>
+          </Link>
+          {targetReport.attributes.processingStatus === 'Uncomplete' && (
+            <Button
+              variant="contained"
+              sx={{ marginRight: '20px', textTransform: 'lowercase' }}
+              color="error"
+              startIcon={<RemoveCircleIcon />}
+              onClick={handleReportProduct}
+            >
+              Ngưng bán sản phẩm
+            </Button>
+          )}
+          {targetReport.attributes.processingStatus === 'Uncomplete' && (
+            <Button
+              variant="contained"
+              sx={{ marginRight: '20px', textTransform: 'lowercase' }}
+              color="error"
+              startIcon={<PersonOffIcon />}
+              onClick={handleReportUser}
+            >
+              Chặn người dùng
+            </Button>
+          )}
+        </CardActions>
+      </Box>
+    )
+  }
+
   return (
     <div>
       <Modal
@@ -139,193 +674,30 @@ export default function TargetDetailModal(props) {
         }}
       >
         <Fade in={props.open}>
-          {props.targetType === 'user' ? (
-            <Card
-              sx={{
-                maxWidth: 520,
-                margin: 'auto',
-                marginTop: 10,
-                padding: '25px 0px',
-                position: 'relative',
-              }}
-            >
-              <Box
-                sx={{
-                  position: 'absolute',
-                  width: '100%',
-                  textAlign: 'right',
-                  right: '8px',
-                  top: '7px',
-                }}
-              >
-                <IconButton color="error" onClick={props.onClose}>
-                  <ClearIcon />
-                </IconButton>
-                {'  '}
-              </Box>
-              <Typography variant="h5" align="center">
-                Thông tin người dùng
-              </Typography>
-              <CardContent
-                align="center"
-                sx={{ display: 'flex', flexDirection: 'row' }}
-              >
-                <Box>
-                  <Avatar
-                    src={
-                      urlAvatar !== undefined &&
-                      `${process.env.REACT_APP_SERVER_ENDPOINT}${urlAvatar}`
-                    }
-                    alt={'abc'}
-                    sx={{
-                      width: '140px',
-                      height: '140px',
-                      border: '1px solid #ccc',
-                    }}
-                  />
-                </Box>
-                <Box
-                  className="DetailedInfoUser"
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'baseline',
-                    width: '100%',
-                    marginLeft: '30px',
-                  }}
-                >
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Họ tên: {targetData?.fullName}
-                  </Box>
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Username: {targetData?.username}
-                  </Box>
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Email: {targetData?.email}
-                  </Box>
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Trạng thái tài khoản: {!targetData?.blocked}
-                  </Box>
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Trường: {targetData?.university}
-                  </Box>
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Địa chỉ: {targetData?.address}
-                  </Box>
-                </Box>
-              </CardContent>
-              <CardActions sx={{ justifyContent: 'center' }}>
-                <Button
-                  variant="contained"
-                  sx={{ marginRight: '20px', textTransform: 'lowercase' }}
-                  color="error"
-                  startIcon={<PersonOffIcon />}
-                  onClick={handleReportUser}
-                >
-                  Chặn người dùng
-                </Button>
-              </CardActions>
-            </Card>
-          ) : (
-            <Card
-              sx={{
-                maxWidth: 520,
-                margin: 'auto',
-                marginTop: 10,
-                padding: '25px 0px',
-                position: 'relative',
-              }}
-            >
-              <Typography variant="h5" align="center">
-                Thông tin sản phẩm
-              </Typography>
-              <CardContent
-                align="center"
-                sx={{ display: 'flex', flexDirection: 'row' }}
-              >
-                <Box>
-                  <Avatar
-                    src={
-                      urlAvatar !== undefined &&
-                      `${process.env.REACT_APP_SERVER_ENDPOINT}${urlAvatar}`
-                    }
-                    alt={'abc'}
-                    sx={{
-                      width: '140px',
-                      height: '140px',
-                      border: '1px solid #ccc',
-                    }}
-                  />
-                  <Box sx={{ color: 'grey', width: '160px' }}>
-                    Tổng cộng có:
-                    <Box sx={{ ml: '5px', display: 'inline-block' }}>
-                      {targetData?.attributes?.images.data.length}
-                    </Box>{' '}
-                    hình ảnh
-                  </Box>
-                </Box>
-                <Box
-                  className="DetailedInfoUser"
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'baseline',
-                    width: '100%',
-                    marginLeft: '30px',
-                  }}
-                >
-                  <Box sx={{ marginBottom: '8px' }}>
-                    ID sản phẩm: {targetData?.id}
-                  </Box>
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Tên sản phẩm: {targetData?.attributes.name}
-                  </Box>
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Danh mục:{' '}
-                    {targetData?.attributes.category.data.attributes.name}
-                  </Box>
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Giá thành: {targetData?.attributes.price}
-                  </Box>
-                  {/* <Box sx={{ marginBottom: '8px', textAlign: 'left' }}>
-                    Mô tả sản phẩm: {targetData?.attributes.description}
-                  </Box> */}
-                  <Box sx={{ marginBottom: '8px' }}>
-                    Trạng thái sản phẩm:{' '}
-                    {targetData?.attributes.status === 'onSale'
-                      ? 'Còn bán'
-                      : 'Ngưng bán'}
-                  </Box>
-                  {/* <Box sx={{ marginBottom: '8px' }}>
-                      Địa chỉ: {targetData?.address}
-                    </Box> */}
-                  <Box sx={{ marginBottom: '8px', textAlign: 'left' }}>
-                    Lý do: {props.selectedData.description}
-                  </Box>
-                </Box>
-              </CardContent>
-              <CardActions sx={{ justifyContent: 'center' }}>
-                <Button
-                  variant="contained"
-                  sx={{ marginRight: '20px', textTransform: 'lowercase' }}
-                  color="error"
-                  startIcon={<RemoveCircleIcon />}
-                  onClick={handleReportProduct}
-                >
-                  Ngưng bán sản phẩm
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{ marginRight: '20px', textTransform: 'lowercase' }}
-                  color="error"
-                  startIcon={<PersonOffIcon />}
-                  onClick={handleReportUser}
-                >
-                  Chặn người dùng
-                </Button>
-              </CardActions>
-            </Card>
-          )}
+          <Card
+            sx={{
+              maxWidth: 670,
+              margin: 'auto',
+              marginTop: 10,
+              padding: '25px 25px',
+              position: 'relative',
+            }}
+          >
+            {/* Display  */}
+            {props.targetType === 'user' ? (
+              <UserInfoCard
+                onClose={props.onClose}
+                selectedData={props.selectedData}
+              />
+            ) : (
+              targetData !== undefined && (
+                <ProductInfoCard
+                  onClose={props.onClose}
+                  selectedData={props.selectedData}
+                />
+              )
+            )}
+          </Card>
         </Fade>
       </Modal>
       <Snackbar

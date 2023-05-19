@@ -18,6 +18,8 @@ import LoginIcon from '@mui/icons-material/Login'
 import WarningIcon from '@mui/icons-material/Warning'
 import DeleteIcon from '@mui/icons-material/Delete'
 import BeenhereIcon from '@mui/icons-material/Beenhere'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import PendingIcon from '@mui/icons-material/Pending'
 
 import TargetDetailModal from './TargetDetailModal'
 import DeleteReportModal from './DeleteReportModal'
@@ -64,6 +66,7 @@ export default function category() {
   }
 
   const [report, setReport] = React.useState([])
+  const [selectedReport, setSelectedReport] = React.useState()
   const [elementNum, setElementNum] = React.useState([])
   const [selectedPage, setSelectedPage] = React.useState('')
   const [change, setChange] = React.useState(true)
@@ -168,15 +171,18 @@ export default function category() {
             />
           </Paper>
           <Box className="CRUDToolHere">
-            {selectedAccused && (
+            {selectedAccused && selectedReport && (
               <TargetDetailModal
                 open={openTargetDetailInfo}
                 onClose={handleOpenTargetDetailInfo}
+                targetReport={selectedReport}
                 targetID={selectedAccused}
                 targetType={selectedType}
                 selectedData={selectedData}
+                reportList={report}
                 onHandle={() => {
                   setOpenTargetDetailInfo(false)
+                  setChange((prev) => !prev)
                 }}
               />
             )}
@@ -213,12 +219,12 @@ export default function category() {
         <Table sx={{ minWidth: 650 }} size="small" aria-label="simple table">
           <TableHead>
             <TableRow sx={{ backgroundColor: '#1976d2' }}>
-              <TableCell sx={{ color: 'white' }}>Mã báo cáo</TableCell>
-              <TableCell sx={{ color: 'white' }} align="center">
-                Loại báo cáo
-              </TableCell>
+              <TableCell sx={{ color: 'white' }}>ID</TableCell>
               <TableCell sx={{ color: 'white' }} align="center">
                 Người báo cáo
+              </TableCell>
+              <TableCell sx={{ color: 'white' }} align="center">
+                Loại báo cáo
               </TableCell>
               <TableCell sx={{ color: 'white' }} align="center">
                 Mục tiêu bị cáo cáo
@@ -228,6 +234,9 @@ export default function category() {
               </TableCell>
               <TableCell sx={{ color: 'white' }} align="center">
                 Lý do
+              </TableCell>
+              <TableCell sx={{ color: 'white' }} align="center">
+                Trạng thái
               </TableCell>
               <TableCell sx={{ color: 'white' }} align="center">
                 Thao tác
@@ -245,46 +254,6 @@ export default function category() {
                   {row.id}
                 </TableCell>
 
-                {/* Phân loại tố cáo */}
-                <TableCell align="center">
-                  {row.attributes?.type === 'user' ? (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        padding: '3px',
-                        color: 'darkblue',
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        backgroundColor: 'lightblue',
-                        fontSize: '13px',
-                      }}
-                    >
-                      <PersonIcon sx={{ mr: '6px', fontSize: '14px' }} />
-                      Người dùng
-                    </Box>
-                  ) : (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        padding: '3px',
-                        color: 'green',
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        backgroundColor: 'lightgreen',
-                      }}
-                    >
-                      <InventoryIcon sx={{ mr: 1, fontSize: '14px' }} />
-                      Sản phẩm
-                    </Box>
-                  )}
-                </TableCell>
-
                 {/* Tên người tố cáo */}
                 <TableCell
                   align="left"
@@ -295,21 +264,137 @@ export default function category() {
                         : '',
                   }}
                 >
-                  {row.attributes?.reporter?.data === undefined
-                    ? 'Không có dữ liệu'
-                    : row.attributes?.reporter.data?.attributes.username}
+                  <Box
+                    sx={{
+                      width: '120px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {row.attributes?.reporter?.data === undefined
+                      ? 'Không có dữ liệu'
+                      : row.attributes?.reporter.data?.attributes.username}
+                  </Box>
                 </TableCell>
 
-                {/* Tên */}
+                {/* Phân loại tố cáo */}
+                <TableCell align="center">
+                  {row.attributes?.type === 'user' ? (
+                    <Box
+                      sx={{
+                        width: '100px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        padding: '3px',
+                        color: 'darkblue',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        backgroundColor: 'lightblue',
+                      }}
+                    >
+                      <PersonIcon sx={{ mr: '6px', fontSize: '14px' }} />
+                      Người dùng
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        width: '100px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        padding: '3px',
+                        color: 'green',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        backgroundColor: 'lightgreen',
+                      }}
+                    >
+                      <InventoryIcon sx={{ mr: 1, fontSize: '14px' }} />
+                      Sản phẩm
+                    </Box>
+                  )}
+                </TableCell>
+
+                {/* Tên mục tiêu bị tố cáo */}
                 <TableCell align="left">
-                  <Link href="#" underline="none">
-                    {row.attributes?.type === 'product'
-                      ? row.attributes.product.data?.attributes.name
-                      : row.attributes.accused.data?.attributes.username}
-                  </Link>
+                  {row.attributes?.type === 'product' ? (
+                    <Link
+                      href={
+                        process.env.REACT_APP_PUBLIC_ECOMMERCE_URL +
+                        'product/' +
+                        row.attributes.product?.data?.id
+                      }
+                      underline="none"
+                      target="_blank"
+                    >
+                      <Box
+                        sx={{
+                          // whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          width: '175px',
+                          display: '-webkit-box',
+                          '-webkit-line-clamp': '2',
+                          '-webkit-box-orient': 'vertical',
+                        }}
+                      >
+                        <Tooltip
+                          title={
+                            'Đi tới trang sản phẩm (' +
+                            row.attributes.product.data?.attributes.name +
+                            ')'
+                          }
+                          placement="right"
+                        >
+                          <Box sx={{ width: 'fit-content' }}>
+                            {row.attributes.product.data?.attributes.name}
+                          </Box>
+                        </Tooltip>
+                      </Box>
+                    </Link>
+                  ) : (
+                    <Link
+                      href={
+                        process.env.REACT_APP_PUBLIC_ECOMMERCE_URL +
+                        'user/info/' +
+                        row.attributes.accused.data?.id
+                      }
+                      underline="none"
+                      target="_blank"
+                    >
+                      <Box
+                        sx={{
+                          // whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          width: '180px',
+                          display: '-webkit-box',
+                          '-webkit-line-clamp': '2',
+                          '-webkit-box-orient': 'vertical',
+                        }}
+                      >
+                        <Tooltip
+                          title={
+                            'Đi tới trang sản phẩm (' +
+                            row.attributes.accused.data?.attributes.username +
+                            ')'
+                          }
+                          placement="right"
+                        >
+                          <Box sx={{ width: 'fit-content' }}>
+                            {row.attributes.accused.data?.attributes.username}
+                          </Box>
+                        </Tooltip>
+                      </Box>
+                    </Link>
+                  )}
                 </TableCell>
 
-                {/* Mô tả */}
+                {/* Lý do tố cáo */}
                 <TableCell align="center">
                   {formatDate(row.attributes.createdAt)}
                 </TableCell>
@@ -325,24 +410,46 @@ export default function category() {
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      width: '280px',
+                      width: '250px',
                     }}
                   >
                     {row.attributes.description
-                      ? row.attributes.description?.length > 30
-                        ? row.attributes.description.substring(0, 30) + '...'
-                        : row.attributes.description
+                      ? row.attributes.description
                       : 'Chưa rõ lý do'}
                   </Box>
                 </TableCell>
 
-                {/* Công cụ tố cáo */}
+                {/* Trạng thái tố cáo */}
+                <TableCell
+                  align="left"
+                  sx={{
+                    color:
+                      row.attributes?.processingStatus === 'Uncomplete'
+                        ? '#ff3232'
+                        : 'green',
+                  }}
+                >
+                  {console.log(row.attributes?.processingStatus)}
+                  {row.attributes?.processingStatus === 'Uncomplete' ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <PendingIcon sx={{ fontSize: '18px', mr: '3px' }} />
+                      {' Chờ xử lý'}
+                    </Box>
+                  ) : (
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <CheckCircleIcon sx={{ fontSize: '18px', mr: '3px' }} />
+                      {' Đã xử lý'}
+                    </Box>
+                  )}
+                </TableCell>
+
+                {/* Công cụ thao tác tố cáo */}
                 <TableCell align="center">
                   <Tooltip title="Duyệt tố cáo">
                     <IconButton
                       color="primary"
                       sx={{ m: '0 4px' }}
-                      onClick={() =>
+                      onClick={() => {
                         handleOpenTargetDetailInfo(
                           row.attributes?.type === 'product'
                             ? {
@@ -360,36 +467,41 @@ export default function category() {
                                 description: row.attributes.description,
                               },
                         )
-                      }
+                        setSelectedReport(row)
+                      }}
                     >
                       <LoginIcon />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Đánh dấu đã duyệt">
-                    <IconButton
-                      color="info"
-                      sx={{ m: '0 4px' }}
-                      onClick={() =>
-                        handleOpenDeleteReportModal(
-                          row.attributes?.type === 'product'
-                            ? {
-                                id: row.id,
-                                type: 'product',
-                                name: row.attributes.product.data?.attributes
-                                  .name,
-                              }
-                            : {
-                                id: row.id,
-                                type: 'user',
-                                name: row.attributes.accused.data?.attributes
-                                  .username,
-                              },
-                        )
-                      }
-                    >
-                      <BeenhereIcon />
-                    </IconButton>
-                  </Tooltip>
+                  {row.attributes?.processingStatus === 'Uncomplete' ? (
+                    <Tooltip title="Đánh dấu đã duyệt">
+                      <IconButton
+                        color="info"
+                        sx={{ m: '0 4px' }}
+                        onClick={() =>
+                          handleOpenDeleteReportModal(
+                            row.attributes?.type === 'product'
+                              ? {
+                                  id: row.id,
+                                  type: 'product',
+                                  name: row.attributes.product.data?.attributes
+                                    .name,
+                                }
+                              : {
+                                  id: row.id,
+                                  type: 'user',
+                                  name: row.attributes.accused.data?.attributes
+                                    .username,
+                                },
+                          )
+                        }
+                      >
+                        <BeenhereIcon />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    ''
+                  )}
                 </TableCell>
               </TableRow>
             ))}

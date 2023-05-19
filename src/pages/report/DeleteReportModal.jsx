@@ -24,8 +24,8 @@ export default function DeleteReportModal(props) {
 
   const deleteCustomerByID = async (id) => {
     axios
-      .delete(process.env.REACT_APP_API_ENDPOINT + '/reports/' + id, {
-        data: { blocked: true },
+      .put(process.env.REACT_APP_API_ENDPOINT + '/reports/' + id, {
+        data: { processingStatus: 'Complete' },
       })
       .then((response) => {
         setOpenSuccessSnackbar(true)
@@ -45,12 +45,20 @@ export default function DeleteReportModal(props) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {'Xác nhận xóa tố cáo?'}
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{ fontSize: '18px', fontWeight: 'bold' }}
+        >
+          {'Đánh dấu đã duyệt?'}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`Bạn có chắc muốn xóa tố cáo ${
+          <DialogContentText
+            id="alert-dialog-description"
+            sx={{
+              width: '350px',
+            }}
+          >
+            {`Bạn có muốn đánh dấu ${
               props.targetData.type === 'product' ? 'sản phẩm' : 'người dùng'
             } ${props.targetData.name} không ?`}
           </DialogContentText>
@@ -62,7 +70,7 @@ export default function DeleteReportModal(props) {
             variant="outlined"
             onClick={() => deleteCustomerByID(props.targetData.id)}
           >
-            Xóa
+            Xác nhận
           </Button>
         </DialogActions>
       </Dialog>
@@ -72,7 +80,7 @@ export default function DeleteReportModal(props) {
         onClose={handleClose}
       >
         <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
-          Xóa tố cáo thành công
+          Xử lý tố cáo thành công
         </Alert>
       </Snackbar>
       <Snackbar
@@ -81,7 +89,7 @@ export default function DeleteReportModal(props) {
         onClose={handleClose}
       >
         <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-          Xóa tố cáo thất bại
+          Xử lý tố cáo thất bại
         </Alert>
       </Snackbar>
     </div>
