@@ -34,19 +34,19 @@ const MainRoutes = {
       path: '/',
       element: <DashboardDefault />,
     },
-    {
-      path: 'color',
-      element: <Color />,
-    },
-    {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'default',
-          element: <DashboardDefault />,
-        },
-      ],
-    },
+    // {
+    //   path: 'color',
+    //   element: <Color />,
+    // },
+    // {
+    //   path: 'dashboard',
+    //   children: [
+    //     {
+    //       path: 'default',
+    //       element: <DashboardDefault />,
+    //     },
+    //   ],
+    // },
     {
       path: 'category',
       children: [

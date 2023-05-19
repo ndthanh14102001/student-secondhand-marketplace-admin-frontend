@@ -282,7 +282,7 @@ export default function category() {
                       }}
                     >
                       <SmsFailedIcon sx={{ mr: 1 }} />
-                      Chưa được xác thực
+                      Chưa xác thực
                     </Box>
                   )}
                 </TableCell>
