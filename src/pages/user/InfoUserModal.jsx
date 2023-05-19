@@ -11,6 +11,8 @@ import CardActions from '@mui/material/CardActions'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
+import ToggleOffIcon from '@mui/icons-material/ToggleOff'
+import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 
 import LockIcon from '@mui/icons-material/Lock'
 import LockOpenIcon from '@mui/icons-material/LockOpen'
@@ -141,22 +143,53 @@ export default function InfoUserModal(props) {
                   marginLeft: '30px',
                 }}
               >
-                <Box sx={{ marginBottom: '8px' }}>
+                <Box sx={{ marginBottom: '8px', textAlign: 'left' }}>
                   Họ tên: {targetData?.fullName}
                 </Box>
-                <Box sx={{ marginBottom: '8px' }}>
+                <Box sx={{ marginBottom: '8px', textAlign: 'left' }}>
                   Username: {targetData?.username}
                 </Box>
-                <Box sx={{ marginBottom: '8px' }}>
+                <Box sx={{ marginBottom: '8px', textAlign: 'left' }}>
                   Email: {targetData?.email}
                 </Box>
-                <Box sx={{ marginBottom: '8px' }}>
-                  Trạng thái tài khoản: {!targetData?.blocked}
+                <Box
+                  sx={{
+                    marginBottom: '8px',
+                    textAlign: 'left',
+                    display: 'flex',
+                  }}
+                >
+                  <Box sx={{ mr: '4px' }}>Trạng thái tài khoản: </Box>
+                  {!targetData?.blocked ? (
+                    <Box
+                      sx={{
+                        color: 'green',
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <ToggleOffIcon sx={{ mr: 1 }} />
+                      Hoạt động
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        color: 'red',
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <ToggleOnIcon sx={{ mr: 1 }} />
+                      Đã chặn
+                    </Box>
+                  )}
                 </Box>
-                <Box sx={{ marginBottom: '8px' }}>
+                {/* <Box sx={{ marginBottom: '8px', textAlign: 'left' }}>
                   Trường: {targetData?.university}
-                </Box>
-                <Box sx={{ marginBottom: '8px' }}>
+                </Box> */}
+                <Box sx={{ marginBottom: '8px', textAlign: 'left' }}>
                   Địa chỉ: {targetData?.address}
                 </Box>
               </Box>

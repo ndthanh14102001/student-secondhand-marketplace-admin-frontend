@@ -24,7 +24,7 @@ const dashboard = {
     // },
     {
       id: 'category',
-      title: 'Category',
+      title: 'Danh mục',
       type: 'item',
       url: '/category/default',
       icon: AppstoreOutlined,
@@ -32,7 +32,7 @@ const dashboard = {
     },
     {
       id: 'user',
-      title: 'User',
+      title: 'Người dùng',
       type: 'item',
       url: '/user/default',
       icon: UserOutlined,
@@ -40,7 +40,7 @@ const dashboard = {
     },
     {
       id: 'report',
-      title: 'Report',
+      title: 'Tố cáo',
       type: 'item',
       url: '/report/default',
       icon: WarningOutlined,

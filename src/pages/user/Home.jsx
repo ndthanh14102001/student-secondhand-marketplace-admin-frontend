@@ -189,9 +189,9 @@ export default function category() {
               <TableCell sx={{ color: 'white' }} align="center">
                 Trạng thái
               </TableCell>
-              <TableCell sx={{ color: 'white' }} align="center">
+              {/* <TableCell sx={{ color: 'white' }} align="center">
                 Trường
-              </TableCell>
+              </TableCell> */}
               <TableCell sx={{ color: 'white' }} align="center">
                 Thao tác
               </TableCell>
@@ -313,7 +313,7 @@ export default function category() {
                     </Box>
                   )}
                 </TableCell>
-                <TableCell align="left">{row.university}</TableCell>
+                {/* <TableCell align="left">{row.university}</TableCell> */}
                 <TableCell align="center">
                   <IconButton
                     color="primary"
@@ -323,9 +323,9 @@ export default function category() {
                   >
                     <ConstructionIcon />
                   </IconButton>
-                  <IconButton color="info">
+                  {/* <IconButton color="info">
                     <CircleNotificationsIcon />
-                  </IconButton>
+                  </IconButton> */}
                   {/* <IconButton
                     color="error"
                     onClick={() => handleOpenDeleteUserModal(row)}

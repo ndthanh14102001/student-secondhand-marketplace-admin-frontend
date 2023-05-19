@@ -159,7 +159,22 @@ export default function AddUserModal(props) {
             </Typography>
             <CardContent align="center">
               <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <Box sx={{ display: 'flex' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginRight: '8px',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      color: 'grey',
+                      fontSize: '11px',
+                      mb: '4px',
+                    }}
+                  >
+                    Ảnh danh mục
+                  </Box>
                   <Avatar
                     sx={{
                       width: 150,
@@ -167,6 +182,7 @@ export default function AddUserModal(props) {
                       m: 'auto',
                       borderRadius: '6px',
                       border: '2px dashed lightgrey',
+                      padding: '3px',
                     }}
                     alt="avatar"
                     src={urlAvatar ? urlAvatar : imagePlaceholder}
@@ -175,6 +191,9 @@ export default function AddUserModal(props) {
                     //   buttonPressed ? 'input-style-active pointer' : ''
                     // }
                   />
+                  <Box sx={{ color: 'grey', fontSize: '11px', mt: '6px' }}>
+                    Ấn vào ảnh để thêm ảnh
+                  </Box>
                 </Box>
                 <Box>
                   <FormControl sx={{ m: 1, width: '350px' }} variant="outlined">

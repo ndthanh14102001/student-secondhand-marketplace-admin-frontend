@@ -153,13 +153,12 @@ export default function category() {
             />
           </Paper>
         </Box>
-        <Box
-          sx={{ display: 'flex', justifyContent: 'center', margin: '0 10px' }}
-        >
+        <Box>
           <Button
             variant="contained"
             startIcon={<AddCircleIcon />}
             onClick={handleOpenAddCategoryModal}
+            sx={{ margin: '0 10px', padding: '9px 16px' }}
           >
             Thêm danh mục
           </Button>

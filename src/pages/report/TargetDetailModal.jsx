@@ -446,13 +446,13 @@ export default function TargetDetailModal(props) {
                   border: '1px solid #ccc',
                 }}
               />
-              <Box sx={{ color: 'grey', width: '160px' }}>
+              {/* <Box sx={{ color: 'grey', width: '160px' }}>
                 Tổng cộng có:
                 <Box sx={{ ml: '5px', display: 'inline-block' }}>
                   {targetData?.attributes?.images.data.length}
                 </Box>{' '}
                 hình ảnh
-              </Box>
+              </Box> */}
             </Box>
             <Box
               className="DetailedInfoUser"
@@ -650,7 +650,7 @@ export default function TargetDetailModal(props) {
               startIcon={<PersonOffIcon />}
               onClick={handleReportUser}
             >
-              Chặn người dùng
+              Chặn người đăng bán
             </Button>
           )}
         </CardActions>
@@ -676,7 +676,7 @@ export default function TargetDetailModal(props) {
         <Fade in={props.open}>
           <Card
             sx={{
-              maxWidth: 670,
+              maxWidth: 690,
               margin: 'auto',
               marginTop: 10,
               padding: '25px 25px',
