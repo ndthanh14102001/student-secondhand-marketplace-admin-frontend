@@ -240,9 +240,12 @@ export default function category() {
                 key={row.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
+                {/* ID */}
                 <TableCell component="th" scope="row">
                   {row.id}
                 </TableCell>
+
+                {/* Phân loại tố cáo */}
                 <TableCell align="center">
                   {row.attributes?.type === 'user' ? (
                     <Box
@@ -281,6 +284,8 @@ export default function category() {
                     </Box>
                   )}
                 </TableCell>
+
+                {/* Tên người tố cáo */}
                 <TableCell
                   align="left"
                   sx={{
@@ -294,6 +299,8 @@ export default function category() {
                     ? 'Không có dữ liệu'
                     : row.attributes?.reporter.data?.attributes.username}
                 </TableCell>
+
+                {/* Tên */}
                 <TableCell align="left">
                   <Link href="#" underline="none">
                     {row.attributes?.type === 'product'
@@ -301,6 +308,8 @@ export default function category() {
                       : row.attributes.accused.data?.attributes.username}
                   </Link>
                 </TableCell>
+
+                {/* Mô tả */}
                 <TableCell align="center">
                   {formatDate(row.attributes.createdAt)}
                 </TableCell>
@@ -326,6 +335,8 @@ export default function category() {
                       : 'Chưa rõ lý do'}
                   </Box>
                 </TableCell>
+
+                {/* Công cụ tố cáo */}
                 <TableCell align="center">
                   <Tooltip title="Duyệt tố cáo">
                     <IconButton
