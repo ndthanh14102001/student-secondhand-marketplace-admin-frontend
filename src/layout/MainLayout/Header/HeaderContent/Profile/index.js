@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 // material-ui
 import { useTheme } from '@mui/material/styles'
@@ -66,15 +67,12 @@ function a11yProps(index) {
 const Profile = () => {
   const theme = useTheme()
 
-  const handleLogout = async () => {
-    // logout
-  }
-
   const anchorRef = useRef(null)
   const [open, setOpen] = useState(false)
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
   }
+  const navigate = useNavigate()
 
   const handleClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
@@ -90,6 +88,10 @@ const Profile = () => {
   }
 
   const iconBackColorOpen = 'grey.300'
+
+  const handleLogout = async () => {
+    navigate('/login')
+  }
 
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
@@ -174,7 +176,7 @@ const Profile = () => {
                             </Stack>
                           </Stack>
                         </Grid>
-                        <Grid item>
+                        {/* <Grid item>
                           <IconButton
                             size="large"
                             color="secondary"
@@ -182,7 +184,7 @@ const Profile = () => {
                           >
                             <LogoutOutlined />
                           </IconButton>
-                        </Grid>
+                        </Grid> */}
                       </Grid>
                     </CardContent>
                     {open && (
