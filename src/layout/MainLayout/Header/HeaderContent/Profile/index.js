@@ -204,15 +204,15 @@ const Profile = () => {
                                 alignItems: 'center',
                                 textTransform: 'capitalize',
                               }}
-                              icon={
-                                <UserOutlined
-                                  style={{
-                                    marginBottom: 0,
-                                    marginRight: '10px',
-                                  }}
-                                />
-                              }
-                              label="Profile"
+                              // icon={
+                              //   <UserOutlined
+                              //     style={{
+                              //       marginBottom: 0,
+                              //       marginRight: '10px',
+                              //     }}
+                              //   />
+                              // }
+                              label="Options"
                               {...a11yProps(0)}
                             />
                             {/* <Tab

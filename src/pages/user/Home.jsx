@@ -79,7 +79,9 @@ export default function category() {
   React.useEffect(() => {
     const requestUrl =
       process.env.REACT_APP_API_ENDPOINT +
-      `/users?populate=*&pagination[page]=${selectedPage}&pagination[pageSize]=7&filters[$or][0][fullName][$contains]=${searchedKey}&filters[$or][1][username][$contains]=${searchedKey}`
+      `/users?populate=*&start=${(selectedPage - 1) * 7}&limit=${
+        selectedPage * 7
+      }&filters[$or][0][fullName][$contains]=${searchedKey}&filters[$or][1][username][$contains]=${searchedKey}`
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {
@@ -90,7 +92,9 @@ export default function category() {
   React.useEffect(() => {
     const requestUrl =
       process.env.REACT_APP_API_ENDPOINT +
-      `/users?populate=*&pagination[page]=${selectedPage}&pagination[pageSize]=7&filters[fullName][$contains]=${searchedKey}`
+      `/users?populate=*&start=${(selectedPage - 1) * 7}&limit=${
+        selectedPage * 7
+      }&filters[fullName][$contains]=${searchedKey}`
     fetch(requestUrl)
       .then((res) => res.json())
       .then((posts) => {

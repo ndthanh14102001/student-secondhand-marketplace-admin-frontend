@@ -3,6 +3,7 @@ import { lazy } from 'react'
 // project import
 import Loadable from 'components/Loadable'
 import MainLayout from 'layout/MainLayout'
+import AuthLogin from 'pages/authentication/auth-forms/AuthLogin'
 
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')))
@@ -32,6 +33,14 @@ const MainRoutes = {
   children: [
     {
       path: '/',
+      element: <Category />,
+    },
+    {
+      path: 'login',
+      element: <AuthLogin />,
+    },
+    {
+      path: 'dashboard',
       element: <DashboardDefault />,
     },
     // {

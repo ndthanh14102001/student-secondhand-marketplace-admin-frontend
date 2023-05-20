@@ -35,7 +35,7 @@ const ProfileTab = ({ handleLogout }) => {
         },
       }}
     >
-      <ListItemButton
+      {/* <ListItemButton
         selected={selectedIndex === 0}
         onClick={(event) => handleListItemClick(event, 0)}
       >
@@ -52,7 +52,7 @@ const ProfileTab = ({ handleLogout }) => {
           <UserOutlined />
         </ListItemIcon>
         <ListItemText primary="View Profile" />
-      </ListItemButton>
+      </ListItemButton> */}
 
       {/* <ListItemButton selected={selectedIndex === 3} onClick={(event) => handleListItemClick(event, 3)}>
                 <ListItemIcon>
