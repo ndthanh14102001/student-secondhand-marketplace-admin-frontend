@@ -100,9 +100,7 @@ export default function TargetDetailModal(props) {
           (props.targetType === 'product'
             ? targetData.attributes.userId.data.id
             : targetData.id),
-        {
-          data: { blocked: true },
-        },
+        { blocked: true },
       )
       .then(() => {
         axios

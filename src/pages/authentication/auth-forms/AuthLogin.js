@@ -29,6 +29,10 @@ import AnimateButton from 'components/@extended/AnimateButton'
 
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
+import axios from '../../../../node_modules/axios/index'
+import { noRememberLogin, rememberLogin } from 'utils/userLoginStorage'
+import { dispatch } from 'store/index'
+import { login } from 'store/reducers/login'
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
@@ -43,6 +47,16 @@ const AuthLogin = () => {
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault()
+  }
+
+  const checkRoleByUserId = async (userId) => {
+    const requestUrl = process.env.REACT_APP_API_ENDPOINT + '/users/' + userId
+    const response = await axios.get(requestUrl, {
+      params: {
+        populate: ['role'],
+      },
+    })
+    return response?.data?.role?.type === 'admin'
   }
 
   return (
@@ -74,15 +88,28 @@ const AuthLogin = () => {
               }),
             })
               .then((res) => res.json())
-              .then((data) => {
-                console.log(data)
-                navigate('/')
+              .then(async (data) => {
+                if (data?.error) {
+                  setErrors({ submit: data?.error?.message })
+                } else if (await checkRoleByUserId(data?.user?.id)) {
+                  if (checked) {
+                    rememberLogin(data?.jwt, data?.user)
+                  }
+                  noRememberLogin(data?.jwt, data?.user)
+                  dispatch(login({ user: data?.user }))
+                  navigate('/')
+                } else {
+                  setErrors({
+                    submit: 'Bạn không có quyền truy cập vào trang này',
+                  })
+                }
               })
               .catch((error) => {
                 // Xử lý lỗi nếu có
-                console.error(error)
+                // setErrors({ submit: err.message })
               })
           } catch (err) {
+            console.log('err', err)
             setStatus({ success: false })
             setErrors({ submit: err.message })
             setSubmitting(false)

@@ -19,7 +19,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { Avatar, Box } from '../../../node_modules/@mui/material/index'
 
-export default function AddUserModal(props) {
+export default function AddCategoryModal(props) {
   // Thông báo snackbar
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = React.useState(false)
   const [openErrorSnackbar, setOpenErrorSnackbar] = React.useState(false)
@@ -79,7 +79,7 @@ export default function AddUserModal(props) {
             .then((response) => {
               setOpenSuccessSnackbar(true)
               console.log(response)
-              props.onCreate()
+              props.onCreate(modifiedData?.parent ? null : response?.data?.data)
             })
             .catch((error) => {
               setOpenErrorSnackbar(true)
@@ -96,7 +96,15 @@ export default function AddUserModal(props) {
         .then((response) => {
           setOpenSuccessSnackbar(true)
           console.log(response)
-          props.onCreate()
+          props.onCreate(modifiedData?.parent ? null : response?.data?.data)
+          setModifiedData({
+            name: '',
+            description: null,
+            parent: null,
+            children: null,
+            image: null,
+          })
+          props?.onClose()
         })
         .catch((error) => {
           setOpenErrorSnackbar(true)

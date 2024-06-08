@@ -24,7 +24,7 @@ import UpdateCategoryModal from './UpdateCategoryModal'
 export default function category() {
   const [customer, setCustomer] = useState([])
   const [elementNum, setElementNum] = useState([])
-  const [selectedPage, setSelectedPage] = useState('')
+  const [selectedPage, setSelectedPage] = useState(1)
   const [change, setChange] = useState(true)
 
   const handleGetPage = (event, elementNum) => {
@@ -64,7 +64,7 @@ export default function category() {
     setSelectedCategory(category)
   }
 
-  const handleOnCreate = () => {
+  const handleOnCreate = (category) => {
     const requestUrl =
       process.env.REACT_APP_API_ENDPOINT +
       `/categories?populate=*&pagination[page]=1&pagination[pageSize]=7&filters[name][$contains]=${searchedKey}`
@@ -72,6 +72,9 @@ export default function category() {
       .then((res) => res.json())
       .then((posts) => {
         setCustomer(posts.data)
+        if (category) {
+          setElementNum([...elementNum, category])
+        }
       })
   }
 
@@ -224,10 +227,7 @@ export default function category() {
                   {row.attributes.image?.data ? (
                     <Box key={row.id}>
                       <img
-                        src={
-                          process.env.REACT_APP_SERVER_ENDPOINT +
-                          row.attributes.image.data.attributes.url
-                        }
+                        src={row.attributes.image.data.attributes.url}
                         alt={row.attributes.image.data.attributes.name}
                         style={{ width: '50px', height: '50px' }}
                       ></img>

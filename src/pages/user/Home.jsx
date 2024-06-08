@@ -62,7 +62,6 @@ export default function category() {
     setCustomer(customer.filter((item) => item.id !== deletedID))
     setChange(!change)
     handleCloseDeleteUserModal()
-    console.log(deletedID)
   }
 
   //Handle open info user modal
@@ -237,9 +236,7 @@ export default function category() {
                 <TableCell align="center">
                   {row.avatar !== undefined ? (
                     <Avatar
-                      src={
-                        process.env.REACT_APP_SERVER_ENDPOINT + row.avatar?.url
-                      }
+                      src={row.avatar?.url}
                       alt={row.username}
                       style={{
                         width: '50px',
